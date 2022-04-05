@@ -1,0 +1,9 @@
+.DS_Store
+*.xlsx
+*.png
+*~
+MRN_Formatted
+onedrive/Working/Final Data/
+*.docx
+/onedrive/population/
+# has a sql not including just in case
