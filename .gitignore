@@ -3,7 +3,8 @@
 *.png
 *~
 MRN_Formatted
-onedrive/Working/Final Data/
+onedrive/Working/Final Data/Patient*
 *.docx
+
 /onedrive/population/
-# has a sql not including just in case
+# Has a sql file. Not including just in case.
