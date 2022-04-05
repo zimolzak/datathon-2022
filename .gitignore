@@ -6,5 +6,5 @@ MRN_Formatted
 onedrive/Working/Final Data/Patient*
 *.docx
 
-/onedrive/population/
+/onedrive/population/Datathon*
 # Has a sql file. Not including just in case.
