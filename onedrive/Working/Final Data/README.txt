@@ -56,3 +56,19 @@ head -n 1 *.txt >> README.txt
 ==> Patient Orders 17 20220327.txt <==
 #|pat_id|PAT_ENC_CSN_ID|Order ID|Procedure ID|Procedure Name|Procedure Code|Order Time|PROC_BGN_TIME|PROC_END_TIME|Result Time|Order Status Code|Order Status
 ```
+
+
+# File list (note dates)
+
+```
+total 417128
+-rwxr-xr-x  1 ajz  staff     22348 Mar 25 13:17 Datathon Project 17 Final Requiremnts.docx
+-rwxr-xr-x  1 ajz  staff   2784938 Mar 27 16:31 Patient Comorbidities 17 20220327.txt
+-rwxr-xr-x  1 ajz  staff    649760 Mar 26 22:39 Patient Demographics 17 20220326.txt
+-rwxr-xr-x  1 ajz  staff   3073414 Mar 26 22:48 Patient ED Admissions 17 20220326.txt
+-rwxr-xr-x  1 ajz  staff  19464124 Mar 27 16:31 Patient ED DX Problem List 17 20220327.txt
+-rwxr-xr-x  1 ajz  staff  97158579 Mar 27 17:28 Patient Meds Admin Times 17 20220327.txt
+-rwxr-xr-x  1 ajz  staff  90395019 Mar 27 16:33 Patient Orders 17 20220327.txt
+-rw-r--r--  1 ajz  staff      2978 Apr  5 10:02 README.txt
+-rw-r--r--  1 ajz  staff      2794 Apr  5 09:59 README.txt~
+```
