@@ -1,0 +1,65 @@
+---
+title: "Datathon 2022 cleaning"
+author: "Andrew Zimolzak"
+date: '2022-04-08'
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# Setup
+```{r message=FALSE, warning=FALSE}
+library(ggplot2)
+library(here)
+library(dplyr)
+library(lubridate)
+library(data.table)
+
+source(file=here("functions.R"))
+```
+
+# Import
+```{r import}
+
+# demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
+# comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
+edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
+# edpro = filename2df('Patient ED DX Problem List 17 20220327.txt')  # 19 MB
+# medad = filename2df('Patient Meds Admin Times 17 20220327.txt')  # 93 MB
+# order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
+```
+
+# Tidy up the data
+```{r tidying}
+edadm %>%
+mutate(
+	ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
+	ed_dis = ymd_hms(ED_DEPARTURE_DTTM),
+	inp_adm = ymd_hms(HOSP_ADMSN_TIME),
+	inp_dis = ymd_hms(HOSP_DISCH_TIME),
+) %>%
+rename(cc10 = First.Chief.Compliant.ICD10, cc9 = First.Chief.Compliant.ICD9) %>%
+select(
+	PAT_ID, ED.Disposition, Patient.Class, cc10, cc9,
+	ed_adm, ed_dis, inp_adm, inp_dis
+) %>%
+mutate(
+	adm_adm = (inp_adm - ed_adm) / ddays(),
+	dis_dis = (inp_dis - ed_dis) / ddays(),
+	ed_dur = (ed_dis - ed_adm) / ddays(),
+	inp_dur = (inp_dis - inp_adm) / ddays(),
+	er_vs_inp = inp_dur - ed_dur
+) -> ed_encounter_tidy
+```
+
+# Basic tables
+
+Distribution of categorical var "Patient Class."
+```{r}
+table(ed_encounter_tidy$Patient.Class)
+```
+
+More complicated var "ED Disposition":
+```{r}
+table(ed_encounter_tidy$ED.Disposition)
+```
