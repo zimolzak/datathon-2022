@@ -1,3 +1,6 @@
+/onedrive/population/Datathon*
+# Has a sql file. Not including just in case.
+
 .DS_Store
 *.xlsx
 *.png
@@ -8,6 +11,4 @@ onedrive/Working/Final Data/Patient*
 .Rapp.history
 .here
 sample.csv
-
-/onedrive/population/Datathon*
-# Has a sql file. Not including just in case.
+output.txt
