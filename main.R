@@ -6,12 +6,22 @@ library(data.table)
 
 source(file=here("functions.R"))
 
+
+
+
+# Import
+
 # demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
 edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # edpro = filename2df('Patient ED DX Problem List 17 20220327.txt')  # 19 MB
 # medad = filename2df('Patient Meds Admin Times 17 20220327.txt')  # 93 MB
 # order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
+
+
+
+
+# Tidy up the data
 
 edadm %>%
 mutate(
@@ -33,10 +43,17 @@ mutate(
 	er_vs_inp = inp_dur - ed_dur
 ) -> ed_encounter_tidy
 
+
+
+
+# Basic tables
+
 cat('\nPatient class')
 table(ed_encounter_tidy$Patient.Class)
 cat('\nDisposition')
 table(ed_encounter_tidy$ED.Disposition)
+
+# Crosstabulation
 
 ed_encounter_tidy %>%
 filter(ED.Disposition == 'Admit' |
@@ -44,6 +61,8 @@ filter(ED.Disposition == 'Admit' |
 	ED.Disposition == 'Observation') -> common_dispos_only
 cat('\nCrosstab')
 table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
+
+# Output a sample CSV.
 
 ed_encounter_tidy %>%
 sample_n(100) %>%  # fixme - maybe upgrade version, use slice_sample()
