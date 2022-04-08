@@ -7,6 +7,7 @@ onedrive/Working/Final Data/Patient*
 *.docx
 .Rapp.history
 .here
+sample.csv
 
 /onedrive/population/Datathon*
 # Has a sql file. Not including just in case.

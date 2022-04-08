@@ -2,6 +2,7 @@ library(ggplot2)
 library(here)
 library(dplyr)
 library(lubridate)
+library(data.table)
 
 source(file=here("functions.R"))
 
@@ -13,15 +14,24 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
 
 edadm %>%
-mutate(ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
+mutate(
+	ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
 	ed_dis = ymd_hms(ED_DEPARTURE_DTTM),
 	inp_adm = ymd_hms(HOSP_ADMSN_TIME),
 	inp_dis = ymd_hms(HOSP_DISCH_TIME),
-	) %>%
+) %>%
 rename(cc10 = First.Chief.Compliant.ICD10, cc9 = First.Chief.Compliant.ICD9) %>%
-select(PAT_ID, ED.Disposition, cc10, cc9,
-	ed_adm, ed_dis, inp_adm, inp_dis,
-	Patient.Class) -> ed_encounter_tidy
+select(
+	PAT_ID, ED.Disposition, Patient.Class, cc10, cc9,
+	ed_adm, ed_dis, inp_adm, inp_dis
+) %>%
+mutate(
+	adm_adm = (inp_adm - ed_adm) / ddays(),
+	dis_dis = (inp_dis - ed_dis) / ddays(),
+	ed_dur = (ed_dis - ed_adm) / ddays(),
+	inp_dur = (inp_dis - inp_adm) / ddays(),
+	er_vs_inp = inp_dur - ed_dur
+) -> ed_encounter_tidy
 
 cat('\nPatient class')
 table(ed_encounter_tidy$Patient.Class)
@@ -34,3 +44,9 @@ filter(ED.Disposition == 'Admit' |
 	ED.Disposition == 'Observation') -> common_dispos_only
 cat('\nCrosstab')
 table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
+
+ed_encounter_tidy %>%
+sample_n(100) %>%  # fixme - maybe upgrade version, use slice_sample()
+arrange(ED.Disposition, Patient.Class) %>%
+select(-PAT_ID, -cc10, -cc9) %>%
+fwrite(here("sample.csv"))
