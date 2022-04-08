@@ -63,3 +63,24 @@ More complicated var "ED Disposition":
 ```{r}
 table(ed_encounter_tidy$ED.Disposition)
 ```
+
+# Crosstabulation (3x4)
+
+```{r}
+ed_encounter_tidy %>%
+filter(ED.Disposition == 'Admit' |
+	ED.Disposition == 'Discharge' |
+	ED.Disposition == 'Observation') -> common_dispos_only
+table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
+```
+We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Oddly, Observation goes with Observation, but sometimes disposition=Admit does too. Very few class=Outpatient.
+
+# Output a sample CSV.
+
+```{r}
+ed_encounter_tidy %>%
+sample_n(100) %>%  # fixme - maybe upgrade version, use slice_sample()
+arrange(ED.Disposition, Patient.Class) %>%
+select(-PAT_ID, -cc10, -cc9) %>%
+fwrite(here("sample.csv"))
+```
