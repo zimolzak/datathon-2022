@@ -79,8 +79,14 @@ We see that disposition=Discharge goes with class=Emergency but not perfectly? L
 
 ```{r}
 ed_encounter_tidy %>%
-sample_n(100) %>%  # fixme - maybe upgrade version, use slice_sample()
-arrange(ED.Disposition, Patient.Class) %>%
-select(-PAT_ID, -cc10, -cc9) %>%
-fwrite(here("sample.csv"))
+  select(-PAT_ID, -cc10, -cc9) -> sample_me
+
+sample_me %>%
+  slice_sample(n = 100) %>%
+  arrange(ED.Disposition, Patient.Class) %>%
+  fwrite(here("sample.csv"))
+
+sample_me %>%
+  slice_sample(n=10) %>%
+  arrange(ED.Disposition, Patient.Class)
 ```
