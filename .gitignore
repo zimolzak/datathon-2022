@@ -15,3 +15,9 @@ output.txt
 .Rproj.user
 sample 2.csv
 .Rhistory
+*.tex
+*.log
+*.aux
+*.html
+*.pdf
+Untitled*
