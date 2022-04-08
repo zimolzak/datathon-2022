@@ -27,3 +27,10 @@ cat('\nPatient class')
 table(ed_encounter_tidy$Patient.Class)
 cat('\nDisposition')
 table(ed_encounter_tidy$ED.Disposition)
+
+ed_encounter_tidy %>%
+filter(ED.Disposition == 'Admit' |
+	ED.Disposition == 'Discharge' |
+	ED.Disposition == 'Observation') -> common_dispos_only
+cat('\nCrosstab')
+table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
