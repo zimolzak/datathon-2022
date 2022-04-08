@@ -23,4 +23,7 @@ select(PAT_ID, ED.Disposition, cc10, cc9,
 	ed_adm, ed_dis, inp_adm, inp_dis,
 	Patient.Class) -> ed_encounter_tidy
 
-head(ed_encounter_tidy)
+cat('\nPatient class')
+table(ed_encounter_tidy$Patient.Class)
+cat('\nDisposition')
+table(ed_encounter_tidy$ED.Disposition)
