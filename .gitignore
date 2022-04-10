@@ -21,5 +21,3 @@ sample 2.csv
 *.html
 *.pdf
 Untitled*
-
-!main.html
