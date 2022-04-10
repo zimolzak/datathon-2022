@@ -1,10 +1,10 @@
 ---
-title: "Datathon 2022 cleaning"
-author: "Andrew Zimolzak"
-date: '2022-04-08'
+title: "BCM Datathon Team 17 Cleaning"
+author: "Andrew Zimolzak, MD, MMSc"
+date: 'April, 2022'
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 # Setup
@@ -19,7 +19,8 @@ library(knitr)
 source(file=here("functions.R"))
 ```
 
-# Import data
+Import data:
+
 ```{r}
 
 # demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
@@ -30,7 +31,8 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
 ```
 
-# Tidy up the data
+Tidy up the data:
+
 ```{r}
 edadm %>%
   mutate(
@@ -53,19 +55,21 @@ edadm %>%
   ) -> ed_encounter_tidy
 ```
 
-# Basic tables
+# Descriptive tables
 
-Distribution of categorical var **Patient Class**.
+## Patient Class
+
 ```{r}
 table(ed_encounter_tidy$Patient.Class) %>% kable()
 ```
 
-More complicated var **ED Disposition**:
+## ED Disposition
+
 ```{r}
 table(ed_encounter_tidy$ED.Disposition) %>% kable()
 ```
 
-# Crosstabulation (disposition X class)
+## Crosstabulation (disposition X class)
 
 ```{r}
 table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kable()
@@ -74,7 +78,13 @@ table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kab
 
 We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Obviously, Observation goes with Observation, but not as much as class=Inpatient. Aldo disposition=Admit goes with class=Observation. Very few class=Outpatient at all.
 
-# Output a sample CSV
+Also very few class=Emergency and disposition=Admit.
+
+This is all possibly because we requested ER discharge to home and not admit?
+
+# Sample data tables for inspection
+
+Write a big one to disk:
 
 ```{r}
 ed_encounter_tidy %>%
@@ -86,27 +96,31 @@ sample_me %>%
   fwrite(here("sample.csv"))
 ```
 
-## Very abbreviated table to inspect within PDF
+Write a short one to output document:
 
 ```{r}
 sample_me %>%
-  slice_sample(n=10) %>%
-  arrange(ED.Disposition, Patient.Class) %>%
+  slice_sample(n=20) %>%
+  arrange(Patient.Class, ED.Disposition) %>%
   transmute(
-    dispo = tolower(substr(ED.Disposition, 1, 3)),
     class = tolower(substr(Patient.Class, 1, 3)),
-    er1 = ed_adm,
-    er2 = ed_dis,
-    in1 = inp_adm,
-    in2 = inp_dis,
-    aa = round(adm_adm, 1),
-    dd = round(dis_dis, 1),
-    los1 = round(ed_dur, 1),
-    los2 = round(inp_dur, 1),
-    dif = round(er_vs_inp, 1)
+    dispo = tolower(substr(ED.Disposition, 1, 3)),
+    # er1 = ed_adm,
+    # er2 = ed_dis,
+    # in1 = inp_adm,
+    # in2 = inp_dis,
+    er1_to_inp1 = round(adm_adm, 2),
+    er2_to_inp2 = round(dis_dis, 2),
+    los_er = round(ed_dur, 2),
+    los_inp = round(inp_dur, 2),
+    diff_los = round(er_vs_inp, 2)
   ) %>%
   kable()
 ```
+
+All numeric values are in **hours.**
+
+Looks like if dispo = discharge, then ER departure time = Hospital discharge time.
 
 # Distribution of rows per patient ID
 
