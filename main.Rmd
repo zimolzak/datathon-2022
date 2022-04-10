@@ -19,7 +19,7 @@ library(knitr)
 source(file=here("functions.R"))
 ```
 
-# Import
+# Import data
 ```{r}
 
 # demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
@@ -55,27 +55,24 @@ edadm %>%
 
 # Basic tables
 
-Distribution of categorical var "Patient Class."
+Distribution of categorical var **Patient Class**.
 ```{r}
-table(ed_encounter_tidy$Patient.Class)
+table(ed_encounter_tidy$Patient.Class) %>% kable()
 ```
 
-More complicated var "ED Disposition":
+More complicated var **ED Disposition**:
 ```{r}
-table(ed_encounter_tidy$ED.Disposition)
+table(ed_encounter_tidy$ED.Disposition) %>% kable()
 ```
 
-# Crosstabulation (3x4)
+# Crosstabulation (disposition X class)
 
 ```{r}
-ed_encounter_tidy %>%
-  filter(ED.Disposition == 'Admit' |
-	  ED.Disposition == 'Discharge' |
-	  ED.Disposition == 'Observation') -> common_dispos_only
+table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kable()
 
-table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
 ```
-We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Oddly, Observation goes with Observation, but sometimes disposition=Admit does too. Very few class=Outpatient.
+
+We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Obviously, Observation goes with Observation, but not as much as class=Inpatient. Aldo disposition=Admit goes with class=Observation. Very few class=Outpatient at all.
 
 # Output a sample CSV
 
@@ -89,7 +86,7 @@ sample_me %>%
   fwrite(here("sample.csv"))
 ```
 
-## Very abbreviated
+## Very abbreviated table to inspect within PDF
 
 ```{r}
 sample_me %>%
@@ -97,7 +94,7 @@ sample_me %>%
   arrange(ED.Disposition, Patient.Class) %>%
   transmute(
     dispo = tolower(substr(ED.Disposition, 1, 3)),
-    clas = tolower(substr(Patient.Class, 1, 3)),
+    class = tolower(substr(Patient.Class, 1, 3)),
     er1 = ed_adm,
     er2 = ed_dis,
     in1 = inp_adm,
@@ -111,7 +108,7 @@ sample_me %>%
   kable()
 ```
 
-# Rows per patient ID
+# Distribution of rows per patient ID
 
 ```{r, message=FALSE}
 ed_encounter_tidy %>%
