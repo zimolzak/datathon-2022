@@ -113,7 +113,10 @@ sample_me %>%
 
 # Rows per patient ID
 
-```{r}
-#ed_encounter_tidy %>%
-  
+```{r, message=FALSE}
+ed_encounter_tidy %>%
+  count(PAT_ID) -> pat_id_counts
+
+qplot(x=n, data=pat_id_counts) +
+  scale_x_log10()
 ```
