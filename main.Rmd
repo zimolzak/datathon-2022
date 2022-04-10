@@ -144,3 +144,24 @@ ed_encounter_tidy %>%
 qplot(x=n, data=pat_id_counts) +
   scale_x_log10()
 ```
+
+# Tables by count
+
+```{r}
+left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
+  filter(Patient.Class != 'Outpatient') %>%
+  mutate(
+    multiple = case_when(
+      n > 1 ~ 'mult',
+      TRUE ~ 'single'
+    )
+  ) -> ed_enc_w_counts
+```
+
+```{r}
+table(ed_enc_w_counts$multiple, ed_enc_w_counts$Patient.Class) %>% kable()
+```
+
+```{r}
+table(ed_enc_w_counts$multiple, ed_enc_w_counts$ED.Disposition) %>% kable()
+```
