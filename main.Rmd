@@ -145,11 +145,17 @@ qplot(x=n, data=pat_id_counts) +
   scale_x_log10()
 ```
 
-# Tables by count
+# Who are the patients with multiple rows?
 
 ```{r}
 left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
   filter(Patient.Class != 'Outpatient') %>%
+  filter(
+    ED.Disposition == 'Admit' |
+      ED.Disposition == 'Discharge' |
+      ED.Disposition == 'Observation' |
+      ED.Disposition == 'Transfer to Another Facility'
+  ) %>%
   mutate(
     multiple = case_when(
       n > 1 ~ 'mult',
@@ -158,10 +164,39 @@ left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
   ) -> ed_enc_w_counts
 ```
 
+## Univariate tables
+
 ```{r}
 table(ed_enc_w_counts$multiple, ed_enc_w_counts$Patient.Class) %>% kable()
 ```
 
 ```{r}
 table(ed_enc_w_counts$multiple, ed_enc_w_counts$ED.Disposition) %>% kable()
+```
+
+```{r}
+ed_enc_w_counts %>% filter(multiple == 'mult') -> m
+ed_enc_w_counts %>% filter(multiple == 'single') -> s
+```
+
+## Crosstab limited to singles
+```{r}
+table(s$Patient.Class, s$ED.Disposition) %>% kable()
+```
+
+## Crosstab limited to multiples
+```{r}
+table(m$Patient.Class, m$ED.Disposition) %>% kable()
+```
+
+## Inspect multiples
+
+```{r}
+m %>% 
+  select(PAT_ID, Patient.Class, ED.Disposition,
+         ed_adm, ed_dis, inp_adm, inp_dis, n) %>%
+  filter(n < 5) %>%
+  arrange(PAT_ID, ed_adm) %>%
+  head(25) %>%
+  kable()
 ```
