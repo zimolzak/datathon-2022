@@ -76,11 +76,24 @@ table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kab
 
 ```
 
-We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Obviously, Observation goes with Observation, but not as much as class=Inpatient. Aldo disposition=Admit goes with class=Observation. Very few class=Outpatient at all.
+Observations:
 
-Also very few class=Emergency and disposition=Admit.
+- disposition=Discharge and class=Emergency: common but not perfectly?
+- d=Admit c=Inpatient: common
+- d=Observation c=Observation: somewhat common
+- d=Observation c=Inpatient: even more common (surprisingly)
+- d=Admit class=Observation: common
+- c=Outpatient: uncommon in general
+- disposition=Admit class=Emergency: rare
 
-This is all possibly because we requested ER discharge to home and not admit?
+The main dispositions that seem to matter:
+
+- Discharge
+- Admit
+- Observation
+- Transfer
+
+We could make a more limited table of 4 dispo X 3 class. This is all possibly because we requested ER discharge to home and not admit?
 
 # Sample data tables for inspection
 
