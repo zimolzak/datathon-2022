@@ -19,7 +19,7 @@ source(file=here("functions.R"))
 ```
 
 # Import
-```{r import}
+```{r}
 
 # demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
@@ -30,26 +30,26 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 ```
 
 # Tidy up the data
-```{r tidying}
+```{r}
 edadm %>%
-mutate(
-	ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
-	ed_dis = ymd_hms(ED_DEPARTURE_DTTM),
-	inp_adm = ymd_hms(HOSP_ADMSN_TIME),
-	inp_dis = ymd_hms(HOSP_DISCH_TIME),
-) %>%
-rename(cc10 = First.Chief.Compliant.ICD10, cc9 = First.Chief.Compliant.ICD9) %>%
-select(
-	PAT_ID, ED.Disposition, Patient.Class, cc10, cc9,
-	ed_adm, ed_dis, inp_adm, inp_dis
-) %>%
-mutate(
-	adm_adm = (inp_adm - ed_adm) / ddays(),
-	dis_dis = (inp_dis - ed_dis) / ddays(),
-	ed_dur = (ed_dis - ed_adm) / ddays(),
-	inp_dur = (inp_dis - inp_adm) / ddays(),
-	er_vs_inp = inp_dur - ed_dur
-) -> ed_encounter_tidy
+  mutate(
+    ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
+	  ed_dis = ymd_hms(ED_DEPARTURE_DTTM),
+	  inp_adm = ymd_hms(HOSP_ADMSN_TIME),
+	  inp_dis = ymd_hms(HOSP_DISCH_TIME),
+  ) %>%
+  rename(cc10 = First.Chief.Compliant.ICD10, cc9 = First.Chief.Compliant.ICD9) %>%
+  select(
+	  PAT_ID, ED.Disposition, Patient.Class, cc10, cc9,
+	  ed_adm, ed_dis, inp_adm, inp_dis
+  ) %>%
+  mutate(
+	  adm_adm = (inp_adm - ed_adm) / ddays(),
+	  dis_dis = (inp_dis - ed_dis) / ddays(),
+	  ed_dur = (ed_dis - ed_adm) / ddays(),
+	  inp_dur = (inp_dis - inp_adm) / ddays(),
+	  er_vs_inp = inp_dur - ed_dur
+  ) -> ed_encounter_tidy
 ```
 
 # Basic tables
@@ -68,14 +68,15 @@ table(ed_encounter_tidy$ED.Disposition)
 
 ```{r}
 ed_encounter_tidy %>%
-filter(ED.Disposition == 'Admit' |
-	ED.Disposition == 'Discharge' |
-	ED.Disposition == 'Observation') -> common_dispos_only
+  filter(ED.Disposition == 'Admit' |
+	  ED.Disposition == 'Discharge' |
+	  ED.Disposition == 'Observation') -> common_dispos_only
+
 table(common_dispos_only$ED.Disposition, common_dispos_only$Patient.Class)
 ```
 We see that disposition=Discharge goes with class=Emergency but not perfectly? Likewise, Admit goes with Inpatient. Oddly, Observation goes with Observation, but sometimes disposition=Admit does too. Very few class=Outpatient.
 
-# Output a sample CSV.
+# Output a sample CSV
 
 ```{r}
 ed_encounter_tidy %>%
@@ -89,4 +90,11 @@ sample_me %>%
 sample_me %>%
   slice_sample(n=10) %>%
   arrange(ED.Disposition, Patient.Class)
+```
+
+# Rows per patient ID
+
+```{r}
+#ed_encounter_tidy %>%
+  
 ```
