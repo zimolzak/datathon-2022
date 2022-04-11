@@ -3,12 +3,12 @@ title: "BCM Datathon Team 17 Cleaning"
 author: "Andrew Zimolzak, MD, MMSc"
 date: 'April, 2022'
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 # Setup
-```{r message=FALSE, warning=FALSE}
+```{r libraries, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(here)
 library(dplyr)
@@ -21,7 +21,7 @@ source(file=here("functions.R"))
 
 Import data:
 
-```{r}
+```{r import}
 
 # demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
@@ -33,7 +33,7 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 
 Tidy up the data:
 
-```{r}
+```{r tidy}
 edadm %>%
   mutate(
     ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
@@ -196,6 +196,17 @@ m %>%
   select(PAT_ID, Patient.Class, ED.Disposition,
          ed_adm, ed_dis, inp_adm, inp_dis, n) %>%
   filter(n < 5) %>%
+  arrange(PAT_ID, ed_adm) %>%
+  head(25) %>%
+  kable()
+```
+
+## Inspect singles
+
+```{r}
+s %>% 
+  select(PAT_ID, Patient.Class, ED.Disposition,
+         ed_adm, ed_dis, inp_adm, inp_dis, er_vs_inp, n) %>%
   arrange(PAT_ID, ed_adm) %>%
   head(25) %>%
   kable()
