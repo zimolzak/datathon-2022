@@ -211,3 +211,5 @@ s %>%
   head(25) %>%
   kable()
 ```
+
+A few have an obs admit with an inpatient LOS > ER los.
