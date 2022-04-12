@@ -33,7 +33,7 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 
 Tidy up the data:
 
-```{r tidy}
+```{r tidy encounters}
 edadm %>%
   mutate(
     ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
@@ -225,15 +225,20 @@ A few have an obs admit with an inpatient LOS > ER los.
 
 ```{r tidy demographics}
 demog %>%
+  mutate(
+    mcaid = ! is.na(MEDICAID_NUM),
+    mcare = (MEDICARE_NUM != "")
+  ) %>%
   select(
     pat_id, Sex, Age, Ethnic.Group, Race, Employment.Status,INTRPTR_NEEDED_YN,
-    Language, Marital.Status, MEDICAID_NUM, MEDICARE_NUM, Financial.Class
+    Language, Marital.Status, mcaid, mcare, Financial.Class
   ) %>%
   rename(
     interpreter = INTRPTR_NEEDED_YN,
-  ) %>%
-  head() %>%
-  kable()
+  ) -> demographics_tidy
+
+demographics_tidy %>% head() %>% kable()
 ```
+
 
 
