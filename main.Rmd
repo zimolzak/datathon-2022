@@ -23,7 +23,7 @@ Import data:
 
 ```{r import}
 
-# demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
+demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
 edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # edpro = filename2df('Patient ED DX Problem List 17 20220327.txt')  # 19 MB
@@ -198,7 +198,9 @@ m %>%
   filter(n < 5) %>%
   arrange(PAT_ID, ed_adm) %>%
   head(25) %>%
-  kable()
+  kable() -> inspect_multiples
+
+# inspect_multiples
 ```
 
 ## Inspect singles
@@ -209,7 +211,29 @@ s %>%
          ed_adm, ed_dis, inp_adm, inp_dis, er_vs_inp, n) %>%
   arrange(PAT_ID, ed_adm) %>%
   head(25) %>%
-  kable()
+  kable() -> inspect_singles
+
+# inspect_singles
 ```
 
 A few have an obs admit with an inpatient LOS > ER los.
+
+
+
+
+# Demographics
+
+```{r tidy demographics}
+demog %>%
+  select(
+    pat_id, Sex, Age, Ethnic.Group, Race, Employment.Status,INTRPTR_NEEDED_YN,
+    Language, Marital.Status, MEDICAID_NUM, MEDICARE_NUM, Financial.Class
+  ) %>%
+  rename(
+    interpreter = INTRPTR_NEEDED_YN,
+  ) %>%
+  head() %>%
+  kable()
+```
+
+
