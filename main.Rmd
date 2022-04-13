@@ -213,10 +213,25 @@ s %>%
   head(25) %>%
   kable() -> inspect_singles
 
-# inspect_singles
+inspect_singles
 ```
 
-A few have an obs admit with an inpatient LOS > ER los.
+## Important note about "singleton" patients
+
+2022-04-13 meeting notes.
+
+ED admiss and ED discharge is literally when they came/went from ED. Whereas, inpatient admit/dis date and time
+are about when they *first showed up to hospital* no matter what part of hospital. Many of the obs people will
+expect to have inp discharge time which is *after* the ED disch time. But not *all.* Occasional data error or whatever.
+
+Also some things come thru diff in Slicer vs Caboodle.
+
+I had noted that: A few (singletons) have an obs admit with an inpatient LOS > ER los (but not all).
+
+Very likely valid approach: ignore the ~500 patients who are singletons (only one row in the ED Admissions table).
+Because so few have actual inpatient-looking encounters anyway.
+
+`Pat Enc CSN` will be needed eventually to join up *notes* to *encounters.*
 
 
 
