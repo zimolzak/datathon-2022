@@ -16,6 +16,7 @@ library(lubridate)
 library(data.table)
 library(knitr)
 library(tableone)
+# library(readxl)
 
 source(file=here("functions.R"))
 ```
@@ -30,6 +31,8 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # edpro = filename2df('Patient ED DX Problem List 17 20220327.txt')  # 19 MB
 # medad = filename2df('Patient Meds Admin Times 17 20220327.txt')  # 93 MB
 # order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
+notes = read.csv(here('onedrive', 'Working', 'DATA', 'Progress Notes File.csv'),
+                 sep="|", stringsAsFactors = FALSE)
 ```
 
 Tidy up the data:
@@ -283,3 +286,6 @@ Sum is 3728. 2:1 white:black. Most common employment is retired. Most married.
 ```{r}
 ggplot(demographics_tidy, aes(Age)) +   geom_density()
 ```
+
+# Notes
+
