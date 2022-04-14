@@ -21,3 +21,5 @@ sample 2.csv
 *.html
 *.pdf
 Untitled*
+.ipynb_checkpoints/
+main.ipynb

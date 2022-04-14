@@ -255,5 +255,17 @@ demog %>%
 demographics_tidy %>% head() %>% kable()
 ```
 
+# Descriptives (of demographics)
 
-
+```{r}
+addmargins(table(demographics_tidy$Sex)) %>% kable()
+table(demographics_tidy$Race) %>% kable()
+table(demographics_tidy$Ethnic.Group) %>% kable()
+table(demographics_tidy$Employment.Status) %>% kable()
+table(demographics_tidy$interpreter) %>% kable()
+table(demographics_tidy$Language) %>% kable()
+table(demographics_tidy$Marital.Status) %>% kable()
+table(demographics_tidy$mcaid) %>% kable()
+table(demographics_tidy$mcare) %>% kable()
+table(demographics_tidy$Financial.Class) %>% kable()
+```
