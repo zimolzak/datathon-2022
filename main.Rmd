@@ -15,6 +15,7 @@ library(dplyr)
 library(lubridate)
 library(data.table)
 library(knitr)
+library(tableone)
 
 source(file=here("functions.R"))
 ```
@@ -213,7 +214,7 @@ s %>%
   head(25) %>%
   kable() -> inspect_singles
 
-inspect_singles
+# inspect_singles
 ```
 
 ## Important note about "singleton" patients
@@ -252,20 +253,33 @@ demog %>%
     interpreter = INTRPTR_NEEDED_YN,
   ) -> demographics_tidy
 
-demographics_tidy %>% head() %>% kable()
+# demographics_tidy %>% head() %>% kable()
 ```
 
 # Descriptives (of demographics)
 
 ```{r}
-addmargins(table(demographics_tidy$Sex)) %>% kable()
-table(demographics_tidy$Race) %>% kable()
-table(demographics_tidy$Ethnic.Group) %>% kable()
-table(demographics_tidy$Employment.Status) %>% kable()
-table(demographics_tidy$interpreter) %>% kable()
-table(demographics_tidy$Language) %>% kable()
-table(demographics_tidy$Marital.Status) %>% kable()
-table(demographics_tidy$mcaid) %>% kable()
-table(demographics_tidy$mcare) %>% kable()
-table(demographics_tidy$Financial.Class) %>% kable()
+# addmargins(table(demographics_tidy$Sex)) %>% kable()
+# table(demographics_tidy$Race) %>% kable()
+# table(demographics_tidy$Ethnic.Group) %>% kable()
+# table(demographics_tidy$Employment.Status) %>% kable()
+# table(demographics_tidy$interpreter) %>% kable()
+# table(demographics_tidy$Language) %>% kable()
+# table(demographics_tidy$Marital.Status) %>% kable()
+# table(demographics_tidy$mcaid) %>% kable()
+# table(demographics_tidy$mcare) %>% kable()
+# table(demographics_tidy$Financial.Class) %>% kable()
+```
+
+Sum is 3728. 2:1 white:black. Most common employment is retired. Most married.
+2:1 nonmedicaid vs yes. Most common managed care and Medicare managed care.
+
+```{r}
+  demographics_tidy %>% select(-pat_id) -> tabulate_me
+  CreateTableOne(data=tabulate_me) -> t1
+  kableone(t1)
+```
+
+```{r}
+ggplot(demographics_tidy, aes(Age)) +   geom_density()
 ```
