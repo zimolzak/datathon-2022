@@ -333,6 +333,10 @@ notes %>%
 
 ```{r export}
 write.csv(done_searching, here('analytic.csv'))
+
+done_searching %>%
+  head() %>%
+  write.csv(here('head_analytic.csv'))
 ```
 
 ```{r}
