@@ -331,6 +331,10 @@ notes %>%
   select(PAT_ID, NOTE_ID, NOTE_TEXT, abbr, negativity) -> done_searching
 ```
 
+```{r export}
+write.csv(done_searching, here('analytic.csv'))
+```
+
 ```{r}
 qplot(done_searching$negativity) + scale_y_log10()
 ```
