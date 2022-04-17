@@ -365,12 +365,18 @@ rbind(x, b.w.ratio) %>% kable()
 ```
 More AA when negativity = 1, fewer when = 2.
 
+
+
+
 # To Do
 
+1. Make a separate pdf for presentation to team / large group (via export CSV)
+2. Consider showing which descriptor (arrange like doc:term matrix)
+3. Join note chunks
+
+## Meh
+
 1. Exclude stopwords (maybe n/a)
-2. Join note chunks
-3. Consider showing which descriptor (arrange like doc:term matrix)
+2. Show length distribution of notes
+3. Dunning log-likelihood
 4. Do stats like `prop.trend.test` / Cochran–Armitage test for trend
-5. Make a separate pdf for presentation to team / large group
-6. Show length distribution of notes
-7. Dunning log-likelihood
