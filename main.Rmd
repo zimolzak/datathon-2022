@@ -291,22 +291,6 @@ ggplot(demographics_tidy, aes(Age)) +   geom_density()
 
 ```{r}
 notes %>%
-   select(PAT_ID, NOTE_ID, LINE) %>%
-   head() %>%
-   kable()
-```
-
-```{r}
-notes %>%
-  filter(LINE == 1) %>%
-  mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
-   select(PAT_ID, NOTE_ID, abbr) %>%
-   head() %>%
-   kable()
-```
-
-```{r}
-notes %>%
   group_by(PAT_ID) %>%
   summarise(note_count = n()) -> counted_notes
 
@@ -338,13 +322,11 @@ Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME
 
 > A total of 6,818 sentences were classified.
 
-```{r}
+```{r text processing}
 notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
   select(PAT_ID, NOTE_ID, NOTE_TEXT, abbr, negativity) -> done_searching
-
-done_searching %>% select(-NOTE_TEXT) %>% head() %>% kable()
 ```
 
 ```{r}
