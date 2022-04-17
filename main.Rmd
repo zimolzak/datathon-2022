@@ -331,14 +331,6 @@ notes %>%
   select(PAT_ID, NOTE_ID, NOTE_TEXT, abbr, negativity) -> done_searching
 ```
 
-```{r export}
-write.csv(done_searching, here('analytic.csv'))
-
-done_searching %>%
-  head() %>%
-  write.csv(here('head_analytic.csv'))
-```
-
 ```{r}
 qplot(done_searching$negativity) + scale_y_log10()
 ```
@@ -348,6 +340,12 @@ qplot(done_searching$negativity) + scale_y_log10()
 ```{r}
 left_join(done_searching, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
   select(-NOTE_TEXT, -abbr) -> joined
+
+write.csv(joined, here('analytic.csv'))
+
+joined %>%
+  head() %>%
+  write.csv(here('head_analytic.csv'))
 ```
 
 # Tables of negativity vs. various factors
