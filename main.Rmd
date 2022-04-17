@@ -32,7 +32,7 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 # medad = filename2df('Patient Meds Admin Times 17 20220327.txt')  # 93 MB
 # order = filename2df('Patient Orders 17 20220327.txt')  # 86 MB
 notes = read.csv(here('onedrive', 'Working', 'DATA', 'Progress Notes File.csv'),
-                 sep="|", stringsAsFactors = FALSE)
+                 sep=",", stringsAsFactors = FALSE)
 ```
 
 Tidy up the data:
@@ -289,3 +289,43 @@ ggplot(demographics_tidy, aes(Age)) +   geom_density()
 
 # Notes
 
+```{r}
+notes %>%
+   select(PAT_ID, NOTE_ID, LINE) %>%
+   head() %>%
+   kable()
+```
+
+```{r}
+notes %>%
+  filter(LINE == 1) %>%
+  mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
+   select(PAT_ID, NOTE_ID, abbr) %>%
+   head() %>%
+   kable()
+```
+
+```{r}
+notes %>%
+  group_by(PAT_ID) %>%
+  summarise(note_count = n()) -> counted_notes
+
+dim(counted_notes)
+```
+
+There are 100 patients for whom we have notes.
+
+```{r}
+ggplot(counted_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
+```
+
+About 35 have only one note.
+
+```{r}
+counted_notes %>%
+  filter(note_count > 1) -> multi_notes
+ggplot(multi_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
+
+```
+
+Many people have dozens of notes. Plenty have hundreds. A few have thousands(!)
