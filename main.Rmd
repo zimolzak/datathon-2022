@@ -353,3 +353,20 @@ qplot(done_searching$negativity) + scale_y_log10()
 
 10k with 0, 1k with 1, 100 with 2, 10 with 3.
 
+```{r}
+left_join(done_searching, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
+  select(-NOTE_TEXT, -abbr) -> joined
+```
+
+# Tables of negativity vs. various factors
+
+```{r}
+table(joined$Sex, joined$negativity) %>% kable()
+```
+
+```{r}
+table(joined$Ethnic.Group, joined$negativity) %>% kable()
+```
+```{r}
+table(joined$Race, joined$negativity) %>% kable()
+```
