@@ -337,10 +337,3 @@ Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME
 > From all sentences in the data set, we selected a random sample of sentences containing one or more of the fifteen selected patient descriptors for manual review .... We categorized the use of each descriptor in one of three possible ways: negative, positive, or out of context.
 
 > A total of 6,818 sentences were classified.
-
-```{r}
-descrip <- c('adher', 'aggress', 'agitat', 'angry', 'challenging', 'combative',
-             'complian', 'comply', 'confront', 'cooperat', 'defensive',
-             'exaggerate', 'hysterical', 'pleasant', 'refuse', 'resist')
-length(descrip)  # It's 16 because I put complian and comply
-```
