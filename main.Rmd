@@ -329,3 +329,18 @@ ggplot(multi_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 ```
 
 Many people have dozens of notes. Plenty have hundreds. A few have thousands(!)
+
+Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME, Tung EL. Negative Patient Descriptors: Documenting Racial Bias In The Electronic Health Record. *Health Aff (Millwood).* 2022;41(2):203-211. doi:10.1377/hlthaff.2021.01423
+
+> Fifteen descriptors were selected for inclusion in the analysis: (non-)adherent, aggressive, agitated, angry, challenging, combative, (non-)compliant, confront, (non-)cooperative, defensive, exaggerate, hysterical, (un-)pleasant, refuse, and resist. We adjusted the descriptors to permit identification of alternative grammatical forms (for example, “adher” for “adherent,” “adhere,” or “adhered)
+
+> From all sentences in the data set, we selected a random sample of sentences containing one or more of the fifteen selected patient descriptors for manual review .... We categorized the use of each descriptor in one of three possible ways: negative, positive, or out of context.
+
+> A total of 6,818 sentences were classified.
+
+```{r}
+descrip <- c('adher', 'aggress', 'agitat', 'angry', 'challenging', 'combative',
+             'complian', 'comply', 'confront', 'cooperat', 'defensive',
+             'exaggerate', 'hysterical', 'pleasant', 'refuse', 'resist')
+length(descrip)  # It's 16 because I put complian and comply
+```
