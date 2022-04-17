@@ -8,11 +8,12 @@ descrip <- c('adher', 'aggress', 'agitat', 'angry', 'challenging', 'combative',
              'complian', 'comply', 'confront', 'cooperat', 'defensive',
              'exaggerate', 'hysterical', 'pleasant', 'refuse', 'resist')
 
-has_any_descriptor <- function(string) {
+count_descriptors <- function(charvec) {
+  n_found = as.numeric(grepl('asdfasdf', charvec))
+  n_found = rep(0, length(n_found))  # vector of zeros
   for (pattern in descrip) {
-    if (grepl(pattern, string)) {
-      return(TRUE)
-    }
+    num_vec = as.numeric(grepl(pattern, charvec))
+    n_found = n_found + num_vec
   }
-  return(FALSE)
+  return(n_found)
 }

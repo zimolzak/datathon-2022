@@ -337,3 +337,19 @@ Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME
 > From all sentences in the data set, we selected a random sample of sentences containing one or more of the fifteen selected patient descriptors for manual review .... We categorized the use of each descriptor in one of three possible ways: negative, positive, or out of context.
 
 > A total of 6,818 sentences were classified.
+
+```{r}
+notes %>%
+  mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
+  mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
+  select(PAT_ID, NOTE_ID, NOTE_TEXT, abbr, negativity) -> done_searching
+
+done_searching %>% select(-NOTE_TEXT) %>% head() %>% kable()
+```
+
+```{r}
+qplot(done_searching$negativity) + scale_y_log10()
+```
+
+10k with 0, 1k with 1, 100 with 2, 10 with 3.
+
