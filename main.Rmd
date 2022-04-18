@@ -542,7 +542,7 @@ g <- ggplot(joined, aes(negativity_binned))
 g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
 ```
 
-```{r create interesting}
+```{r create interesting, message=FALSE, warning=FALSE}
 joined %>%
   select(race_ethn, negativity_binned) %>%
   group_by(race_ethn, negativity_binned) %>%
@@ -556,7 +556,22 @@ joined %>%
 left_join(neg_count, race_neg_count, by="negativity_binned") %>%
   mutate(proportion = tot / grand_tot) -> stack_plot_me
 
-ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) + geom_area(aes(fill = race_ethn))
+stack_plot_me %>%
+  filter(race_ethn == 'Black or African American' & negativity_binned == 0) -> out
+refaa <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'Latino' & negativity_binned == 0) -> out
+refla <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'White or Caucasian' & negativity_binned == 0) -> out
+refwh <- out$proportion
+
+ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
+  geom_area(aes(fill = race_ethn)) +
+  geom_hline(yintercept = refwh + refla) +
+  geom_hline(yintercept = refwh)
 ```
 
 
