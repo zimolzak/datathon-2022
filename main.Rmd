@@ -31,6 +31,7 @@ No adjustment yet for covariates. To see quantitative association results, go to
 library(ggplot2)
 library(here)
 library(dplyr)
+library(tidyr)
 library(lubridate)
 library(data.table)
 library(knitr)
@@ -40,7 +41,7 @@ library(tableone)
 source(file=here("functions.R"))
 ```
 
-```{r import, echo=FALSE}
+```{r import data, echo=FALSE}
 
 demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
@@ -539,6 +540,23 @@ unified_table_binned %>% kable()
 ```{r}
 g <- ggplot(joined, aes(negativity_binned))
 g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
+```
+
+```{r create interesting}
+joined %>%
+  select(race_ethn, negativity_binned) %>%
+  group_by(race_ethn, negativity_binned) %>%
+  summarise(tot = n()) %>%
+  arrange(negativity_binned, race_ethn) -> race_neg_count
+
+joined %>%
+  group_by(negativity_binned) %>%
+  summarise(grand_tot = n()) -> neg_count
+
+left_join(neg_count, race_neg_count, by="negativity_binned") %>%
+  mutate(proportion = tot / grand_tot) -> stack_plot_me
+
+ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) + geom_area(aes(fill = race_ethn))
 ```
 
 
