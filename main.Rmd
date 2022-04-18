@@ -296,6 +296,8 @@ notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
   select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_processing
+
+
 ```
 
 ## Distribution of neg. descriptors per patient
@@ -312,14 +314,14 @@ qplot(done_processing$negativity) + scale_y_log10()
 left_join(done_processing, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
   select(-NOTE_TEXT, -abbr) -> joined
 
-write.csv(joined, here('analytic.csv'))
+write.csv(joined, here('analytic_dataset.csv'))
 
 joined %>%
   head() %>%
-  write.csv(here('head_analytic.csv'))
+  write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
-  select(-PAT_ID, -NOTE_ID, -LINE) %>%
+  select(-PAT_ID, -NOTE_ID, -LINE, -mcaid, -mcare) %>%
   rename(ethnic = Ethnic.Group, employ = Employment.Status, marital = Marital.Status,
          finance = Financial.Class, interp = interpreter, lang = Language) %>%
   slice_sample(n=6) %>%
@@ -353,15 +355,11 @@ rbind(x, b.w.ratio) %>% kable()
 
 More AA when negativity = 1, fewer when = 2.
 
-# To Do
+# Possible to-do items
 
-1.  Make a separate pdf for presentation to team / large group (via export CSV)
-2.  Consider showing which descriptor (arrange like doc:term matrix)
-3.  Join note chunks
-
-## Meh
-
-1.  Exclude stopwords (maybe n/a)
-2.  Show length distribution of notes
-3.  Dunning log-likelihood
-4.  Do stats like `prop.trend.test` / Cochran--Armitage test for trend
+-  Join note chunks
+-  Get complete note data from IT.
+-  Consider showing which descriptor (arrange like doc:term matrix)
+-  Show length distribution of notes
+-  Dunning log-likelihood
+-  Do stats like `prop.trend.test` / Cochran--Armitage test for trend
