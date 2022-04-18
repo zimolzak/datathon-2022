@@ -414,7 +414,7 @@ In these tables, an upward trend in ratio means positive correlation of underpri
 
 ## Sex vs. negative descriptors
 
-```{r}
+```{r table}
 table(joined$Sex, joined$negativity) -> x
 round((x[1,] / x[2,]), 3) -> f.m.ratio
 rbind(x, f.m.ratio) %>% kable()
@@ -422,9 +422,25 @@ rbind(x, f.m.ratio) %>% kable()
 
 **Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
 
+```{r trend test}
+women <- x[1,]
+totals <- x[1,] + x[2,]
+prop.trend.test(women, totals)
+```
+
+```{r plot, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_women = women / totals
+
+qplot(x = xvals, y = p_women) +
+  labs(y='Proportion Women', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_women[1])
+```
+
 ## Ethnicity vs. negative descriptors
 
-```{r}
+```{r table}
 table(joined$Ethnic.Group, joined$negativity)  -> x
 round((x[1,] / x[2,]), 3) -> latino.non.ratio
 rbind(x, latino.non.ratio) %>% kable()
@@ -432,15 +448,49 @@ rbind(x, latino.non.ratio) %>% kable()
 
 **Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
 
+```{r trend test}
+latino <- x[1,]
+totals <- x[1,] + x[2,]
+prop.trend.test(latino, totals)
+```
+
+```{r plot, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_latino = latino / totals
+
+qplot(x = xvals, y = p_latino) +
+  labs(y='Proportion Latino', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_latino[1])
+```
+
+
 ## Race vs. negative descriptors
 
-```{r}
+```{r table}
 table(joined$Race, joined$negativity)  -> x
 round((x[2,] / x[5,]), 2) -> b.w.ratio  # warning, ad-hoc row numbers
 rbind(x, b.w.ratio) %>% kable()
 ```
 
 **Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
+
+```{r trend test}
+black <- x[1,]
+totals <- x[1,] + x[2,]
+prop.trend.test(black, totals)
+```
+
+```{r plot, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_black = black / totals
+
+qplot(x = xvals, y = p_black) +
+  labs(y='Proportion Black', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_black[1])
+```
+
 
 # RESULTS more concise
 
@@ -475,11 +525,10 @@ rbind(x, total, proportion.black) %>% kable()
 
 # To do
 
--  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
+-  Logistic model
+-  Dunning log-likelihood.
 -  Limit only to those discharged from ED to home.
 -  More rigorous handling of those with multiple demographic entries.
 -  Get complete note data from IT.
 -  Consider showing which descriptor (arrange like doc:term matrix).
 -  Show length distribution of notes.
--  Dunning log-likelihood.
--  Logistic model
