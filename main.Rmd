@@ -20,7 +20,6 @@ library(tableone)
 source(file=here("functions.R"))
 ```
 
-
 ```{r import, echo=FALSE}
 
 demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
@@ -32,7 +31,6 @@ edadm = filename2df('Patient ED Admissions 17 20220326.txt')  # 2.9 MB
 notes = read.csv(here('onedrive', 'Working', 'DATA', 'Progress Notes File.csv'),
                  sep=",", stringsAsFactors = FALSE)
 ```
-
 
 ```{r tidy encounters, echo=FALSE}
 edadm %>%
@@ -79,20 +77,20 @@ table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kab
 
 My observations:
 
-- disposition=Discharge and class=Emergency: common but not perfectly?
-- d=Admit c=Inpatient: common
-- d=Observation c=Observation: somewhat common
-- d=Observation c=Inpatient: even more common (surprisingly)
-- d=Admit class=Observation: common
-- c=Outpatient: uncommon in general
-- disposition=Admit class=Emergency: rare
+-   disposition=Discharge and class=Emergency: common but not perfectly?
+-   d=Admit c=Inpatient: common
+-   d=Observation c=Observation: somewhat common
+-   d=Observation c=Inpatient: even more common (surprisingly)
+-   d=Admit class=Observation: common
+-   c=Outpatient: uncommon in general
+-   disposition=Admit class=Emergency: rare
 
 The main dispositions that seem to matter:
 
-- Discharge
-- Admit
-- Observation
-- Transfer
+-   Discharge
+-   Admit
+-   Observation
+-   Transfer
 
 We could make a more limited table of 4 dispo X 3 class. This is all possibly because we requested ER discharge to home and not admit?
 
@@ -154,7 +152,6 @@ left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
   ) -> ed_enc_w_counts
 ```
 
-
 ```{r include=FALSE}
 table(ed_enc_w_counts$multiple, ed_enc_w_counts$Patient.Class) %>% kable()
 ```
@@ -175,7 +172,6 @@ table(s$Patient.Class, s$ED.Disposition) %>% kable()
 ```{r crosstab mult, include=FALSE}
 table(m$Patient.Class, m$ED.Disposition) %>% kable()
 ```
-
 
 ```{r inspect mult, include=FALSE}
 m %>% 
@@ -204,21 +200,15 @@ s %>%
 
 2022-04-13 meeting notes.
 
-ED admiss and ED discharge is literally when they came/went from ED. Whereas, inpatient admit/dis date and time
-are about when they *first showed up to hospital* no matter what part of hospital. Many of the obs people will
-expect to have inp discharge time which is *after* the ED disch time. But not *all.* Occasional data error or whatever.
+ED admiss and ED discharge is literally when they came/went from ED. Whereas, inpatient admit/dis date and time are about when they *first showed up to hospital* no matter what part of hospital. Many of the obs people will expect to have inp discharge time which is *after* the ED disch time. But not *all.* Occasional data error or whatever.
 
 Also some things come thru diff in Slicer vs Caboodle.
 
-I had noted that: A few (singletons) have an obs admit with an inpatient LOS > ER los (but not all).
+I had noted that: A few (singletons) have an obs admit with an inpatient LOS \> ER los (but not all).
 
-Very likely valid approach: ignore the ~500 patients who are singletons (only one row in the ED Admissions table).
-Because so few have actual inpatient-looking encounters anyway.
+Very likely valid approach: ignore the \~500 patients who are singletons (only one row in the ED Admissions table). Because so few have actual inpatient-looking encounters anyway.
 
 `Pat Enc CSN` will be needed eventually to join up *notes* to *encounters.*
-
-
-
 
 # Demographics
 
@@ -239,7 +229,6 @@ demog %>%
 # demographics_tidy %>% head() %>% kable()
 ```
 
-
 ```{r echo=FALSE}
 # addmargins(table(demographics_tidy$Sex)) %>% kable()
 # table(demographics_tidy$Race) %>% kable()
@@ -253,8 +242,7 @@ demog %>%
 # table(demographics_tidy$Financial.Class) %>% kable()
 ```
 
-Sum is 3728. 2:1 white:black. Most common employment is retired. Most married.
-2:1 nonmedicaid vs yes. Most common managed care and Medicare managed care.
+Sum is 3728. 2:1 white:black. Most common employment is retired. Most married. 2:1 nonmedicaid vs yes. Most common managed care and Medicare managed care.
 
 ```{r}
   demographics_tidy %>% select(-pat_id) -> tabulate_me
@@ -293,11 +281,11 @@ ggplot(multi_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 
 Many people have dozens of notes. Plenty have hundreds. A few have thousands(!)
 
-Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME, Tung EL. Negative Patient Descriptors: Documenting Racial Bias In The Electronic Health Record. *Health Aff (Millwood).* 2022;41(2):203-211. doi:10.1377/hlthaff.2021.01423
+Review this: <https://pubmed.ncbi.nlm.nih.gov/35044842/> . Sun M, Oliwa T, Peek ME, Tung EL. Negative Patient Descriptors: Documenting Racial Bias In The Electronic Health Record. *Health Aff (Millwood).* 2022;41(2):203-211. <doi:10.1377/hlthaff.2021.01423>
 
 ## Actual text processing
 
-> Fifteen descriptors were selected for inclusion in the analysis: (non-)adherent, aggressive, agitated, angry, challenging, combative, (non-)compliant, confront, (non-)cooperative, defensive, exaggerate, hysterical, (un-)pleasant, refuse, and resist. We adjusted the descriptors to permit identification of alternative grammatical forms (for example, “adher” for “adherent,” “adhere,” or “adhered)
+> Fifteen descriptors were selected for inclusion in the analysis: (non-)adherent, aggressive, agitated, angry, challenging, combative, (non-)compliant, confront, (non-)cooperative, defensive, exaggerate, hysterical, (un-)pleasant, refuse, and resist. We adjusted the descriptors to permit identification of alternative grammatical forms (for example, "adher" for "adherent," "adhere," or "adhered)
 
 > From all sentences in the data set, we selected a random sample of sentences containing one or more of the fifteen selected patient descriptors for manual review .... We categorized the use of each descriptor in one of three possible ways: negative, positive, or out of context.
 
@@ -307,17 +295,21 @@ Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME
 notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
-  select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_searching
+  select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_processing
 ```
 
+## Distribution of neg. descriptors per patient
+
 ```{r message=FALSE, warning=FALSE}
-qplot(done_searching$negativity) + scale_y_log10()
+qplot(done_processing$negativity) + scale_y_log10()
 ```
 
 10k with 0, 1k with 1, 100 with 2, 10 with 3.
 
-```{r}
-left_join(done_searching, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
+## Example data
+
+```{r analytic dataset, echo=FALSE}
+left_join(done_processing, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
   select(-NOTE_TEXT, -abbr) -> joined
 
 write.csv(joined, here('analytic.csv'))
@@ -325,15 +317,24 @@ write.csv(joined, here('analytic.csv'))
 joined %>%
   head() %>%
   write.csv(here('head_analytic.csv'))
+
+joined %>%
+  select(-PAT_ID, -NOTE_ID, -LINE) %>%
+  rename(ethnic = Ethnic.Group, employ = Employment.Status, marital = Marital.Status,
+         finance = Financial.Class, interp = interpreter, lang = Language) %>%
+  slice_sample(n=6) %>%
+  kable()
+
 ```
 
-# RESULTS: negative descriptors vs. demographic factors
+# RESULTS: Negative descriptors vs. demographic factors
 
 ```{r}
 table(joined$Sex, joined$negativity) -> x
 (x[1,] / x[2,]) -> f.m.ratio
 rbind(x, f.m.ratio) %>% kable()
 ```
+
 More women when negativity = 1 or 2.
 
 ```{r}
@@ -341,6 +342,7 @@ table(joined$Ethnic.Group, joined$negativity)  -> x
 (x[2,] / x[1,]) -> non.latino.ratio
 rbind(x, non.latino.ratio) %>% kable()
 ```
+
 More latino when negativity = 1 or 2
 
 ```{r}
@@ -348,20 +350,18 @@ table(joined$Race, joined$negativity)  -> x
 (x[3,] / x[6,]) -> b.w.ratio
 rbind(x, b.w.ratio) %>% kable()
 ```
+
 More AA when negativity = 1, fewer when = 2.
-
-
-
 
 # To Do
 
-1. Make a separate pdf for presentation to team / large group (via export CSV)
-2. Consider showing which descriptor (arrange like doc:term matrix)
-3. Join note chunks
+1.  Make a separate pdf for presentation to team / large group (via export CSV)
+2.  Consider showing which descriptor (arrange like doc:term matrix)
+3.  Join note chunks
 
 ## Meh
 
-1. Exclude stopwords (maybe n/a)
-2. Show length distribution of notes
-3. Dunning log-likelihood
-4. Do stats like `prop.trend.test` / Cochran–Armitage test for trend
+1.  Exclude stopwords (maybe n/a)
+2.  Show length distribution of notes
+3.  Dunning log-likelihood
+4.  Do stats like `prop.trend.test` / Cochran--Armitage test for trend
