@@ -296,14 +296,23 @@ notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
   select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_processing
+```
 
-
+```{r sum note lines}
+done_processing %>%
+  arrange(NOTE_ID, LINE) %>%
+  group_by(NOTE_ID) %>%
+  summarise(negativity = sum(negativity),
+            PAT_ID = first(PAT_ID),
+            NOTE_ID = first(NOTE_ID),
+            abbr = first(abbr)
+            ) -> summed
 ```
 
 ## Distribution of neg. descriptors per patient
 
 ```{r message=FALSE, warning=FALSE}
-qplot(done_processing$negativity) + scale_y_log10()
+qplot(summed$negativity) + scale_y_log10()
 ```
 
 10k with 0, 1k with 1, 100 with 2, 10 with 3.
@@ -311,8 +320,8 @@ qplot(done_processing$negativity) + scale_y_log10()
 ## Example data
 
 ```{r analytic dataset, echo=FALSE}
-left_join(done_processing, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
-  select(-NOTE_TEXT, -abbr) -> joined
+left_join(summed, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
+  select(-abbr) -> joined
 
 write.csv(joined, here('analytic_dataset.csv'))
 
@@ -321,15 +330,21 @@ joined %>%
   write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
-  select(-PAT_ID, -NOTE_ID, -LINE, -mcaid, -mcare) %>%
+  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare) %>%
   rename(ethnic = Ethnic.Group, employ = Employment.Status, marital = Marital.Status,
          finance = Financial.Class, interp = interpreter, lang = Language) %>%
   slice_sample(n=6) %>%
   kable()
 
 ```
+**Table. Example analytic data set.** I printed the outcome variable
+`negativity`, but only a selection of covariates, for simplicity. All covariates
+are retained in the output CSV files.
+
 
 # RESULTS: Negative descriptors vs. demographic factors
+
+In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
 ```{r}
 table(joined$Sex, joined$negativity) -> x
@@ -337,29 +352,31 @@ table(joined$Sex, joined$negativity) -> x
 rbind(x, f.m.ratio) %>% kable()
 ```
 
-More women when negativity = 1 or 2.
+More women when negativity = 1.
 
 ```{r}
 table(joined$Ethnic.Group, joined$negativity)  -> x
-(x[2,] / x[1,]) -> non.latino.ratio
-rbind(x, non.latino.ratio) %>% kable()
+round((x[1,] / x[2,]), 3) -> latino.non.ratio
+rbind(x, latino.non.ratio) %>% kable()
 ```
 
-More latino when negativity = 1 or 2
+More latino when negativity = 1 or 2.
 
 ```{r}
 table(joined$Race, joined$negativity)  -> x
-(x[3,] / x[6,]) -> b.w.ratio
+
+
+(x[2,] / x[5,]) -> b.w.ratio  # warning, ad-hoc row numbers
 rbind(x, b.w.ratio) %>% kable()
 ```
 
-More AA when negativity = 1, fewer when = 2.
+Fewer AA when negativity = 1, more when = 2 or 3.
 
 # Possible to-do items
 
--  Join note chunks
+-  Variable for "any neg descriptor, Y/N."
 -  Get complete note data from IT.
--  Consider showing which descriptor (arrange like doc:term matrix)
--  Show length distribution of notes
--  Dunning log-likelihood
--  Do stats like `prop.trend.test` / Cochran--Armitage test for trend
+-  Consider showing which descriptor (arrange like doc:term matrix).
+-  Show length distribution of notes.
+-  Dunning log-likelihood.
+-  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
