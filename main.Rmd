@@ -317,7 +317,6 @@ mult_demog %>%
 notes %>%
   group_by(PAT_ID) %>%
   summarise(note_count = n()) -> counted_notes
-
 dim(counted_notes)
 ```
 
@@ -442,7 +441,7 @@ totals <- x[1,] + x[2,]
 prop.trend.test(women, totals)
 ```
 
-```{r plot s, message=FALSE, warning=FALSE}
+```{r plot s, echo=FALSE, message=FALSE, warning=FALSE}
 xvals = as.numeric(colnames(x))
 p_women = women / totals
 
@@ -468,7 +467,7 @@ totals <- x[1,] + x[2,]
 prop.trend.test(latino, totals)
 ```
 
-```{r plot e, message=FALSE, warning=FALSE}
+```{r plot e, echo=FALSE, message=FALSE, warning=FALSE}
 xvals = as.numeric(colnames(x))
 p_latino = latino / totals
 
@@ -495,7 +494,7 @@ totals <- x[1,] + x[2,]
 prop.trend.test(black, totals)
 ```
 
-```{r plot, message=FALSE, warning=FALSE}
+```{r plot, echo=FALSE, message=FALSE, warning=FALSE}
 xvals = as.numeric(colnames(x))
 p_black = black / totals
 
@@ -507,8 +506,7 @@ qplot(x = xvals, y = p_black) +
 
 ## Combined race/ethnicity vs. negative descriptors
 
-```{r table combo}
-# fixme fixme
+```{r table combo, echo=FALSE}
 table(joined$race_ethn, joined$negativity) -> x
 
 Total <- colSums(x)
@@ -522,7 +520,7 @@ rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
 unified_table %>% kable()
 ```
 
-```{r table combo binned}
+```{r table combo binned, echo=FALSE}
 table(joined$race_ethn, joined$negativity_binned) -> x
 
 Total <- colSums(x)
@@ -537,12 +535,12 @@ unified_table_binned %>% kable()
 ```
 
 
-```{r}
+```{r echo=FALSE}
 g <- ggplot(joined, aes(negativity_binned))
 g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
 ```
 
-```{r create interesting, message=FALSE, warning=FALSE}
+```{r create interesting, echo=FALSE, message=FALSE, warning=FALSE}
 joined %>%
   select(race_ethn, negativity_binned) %>%
   group_by(race_ethn, negativity_binned) %>%
