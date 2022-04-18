@@ -1,5 +1,5 @@
 ---
-title: "BCM Datathon Team 17 Cleaning"
+title: "BCM Datathon Team 17 Data Cleaning"
 author: "Andrew Zimolzak, MD, MMSc"
 date: 'April, 2022'
 output:
@@ -7,8 +7,7 @@ output:
   html_document: default
 ---
 
-# Setup
-```{r libraries, message=FALSE, warning=FALSE}
+```{r libraries, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(here)
 library(dplyr)
@@ -21,9 +20,8 @@ library(tableone)
 source(file=here("functions.R"))
 ```
 
-Import data:
 
-```{r import}
+```{r import, echo=FALSE}
 
 demog = filename2df('Patient Demographics 17 20220326.txt')  # 0.6 MB
 # comor = filename2df('Patient Comorbidities 17 20220327.txt')  # 2.7 MB
@@ -35,9 +33,8 @@ notes = read.csv(here('onedrive', 'Working', 'DATA', 'Progress Notes File.csv'),
                  sep=",", stringsAsFactors = FALSE)
 ```
 
-Tidy up the data:
 
-```{r tidy encounters}
+```{r tidy encounters, echo=FALSE}
 edadm %>%
   mutate(
     ed_adm = ymd_hms(EMERGENCY_ADMISSION_DTTM),
@@ -59,7 +56,7 @@ edadm %>%
   ) -> ed_encounter_tidy
 ```
 
-# Descriptive tables
+# Patient visits
 
 ## Patient Class
 
@@ -73,14 +70,14 @@ table(ed_encounter_tidy$Patient.Class) %>% kable()
 table(ed_encounter_tidy$ED.Disposition) %>% kable()
 ```
 
-## Crosstabulation (disposition X class)
+## Don't read this section (diagnostics)
 
-```{r}
+```{r include=FALSE}
 table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kable()
 
 ```
 
-Observations:
+My observations:
 
 - disposition=Discharge and class=Emergency: common but not perfectly?
 - d=Admit c=Inpatient: common
@@ -99,23 +96,10 @@ The main dispositions that seem to matter:
 
 We could make a more limited table of 4 dispo X 3 class. This is all possibly because we requested ER discharge to home and not admit?
 
-# Sample data tables for inspection
-
-Write a big one to disk:
-
-```{r}
+```{r inspect me, include=FALSE}
 ed_encounter_tidy %>%
   select(-PAT_ID, -cc10, -cc9) -> sample_me
 
-sample_me %>%
-  slice_sample(n = 100) %>%
-  arrange(ED.Disposition, Patient.Class) %>%
-  fwrite(here("sample.csv"))
-```
-
-Write a short one to output document:
-
-```{r}
 sample_me %>%
   slice_sample(n=20) %>%
   arrange(Patient.Class, ED.Disposition) %>%
@@ -139,7 +123,7 @@ All numeric values are in **hours.**
 
 Looks like if dispo = discharge, then ER departure time = Hospital discharge time.
 
-# Distribution of rows per patient ID
+## Distribution of encouters per patient ID
 
 ```{r, message=FALSE}
 ed_encounter_tidy %>%
@@ -149,9 +133,11 @@ qplot(x=n, data=pat_id_counts) +
   scale_x_log10()
 ```
 
-# Who are the patients with multiple rows?
+## Don't read this section
 
-```{r}
+About those with only 1 encounter
+
+```{r echo=FALSE}
 left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
   filter(Patient.Class != 'Outpatient') %>%
   filter(
@@ -168,34 +154,30 @@ left_join(ed_encounter_tidy, pat_id_counts, by='PAT_ID') %>%
   ) -> ed_enc_w_counts
 ```
 
-## Univariate tables
 
-```{r}
+```{r include=FALSE}
 table(ed_enc_w_counts$multiple, ed_enc_w_counts$Patient.Class) %>% kable()
 ```
 
-```{r}
+```{r include=FALSE}
 table(ed_enc_w_counts$multiple, ed_enc_w_counts$ED.Disposition) %>% kable()
 ```
 
-```{r}
+```{r include=FALSE}
 ed_enc_w_counts %>% filter(multiple == 'mult') -> m
 ed_enc_w_counts %>% filter(multiple == 'single') -> s
 ```
 
-## Crosstab limited to singles
-```{r}
+```{r crosstab single, include=FALSE}
 table(s$Patient.Class, s$ED.Disposition) %>% kable()
 ```
 
-## Crosstab limited to multiples
-```{r}
+```{r crosstab mult, include=FALSE}
 table(m$Patient.Class, m$ED.Disposition) %>% kable()
 ```
 
-## Inspect multiples
 
-```{r}
+```{r inspect mult, include=FALSE}
 m %>% 
   select(PAT_ID, Patient.Class, ED.Disposition,
          ed_adm, ed_dis, inp_adm, inp_dis, n) %>%
@@ -207,9 +189,9 @@ m %>%
 # inspect_multiples
 ```
 
-## Inspect singles
+Inspect singles
 
-```{r}
+```{r inspect single, include=FALSE}
 s %>% 
   select(PAT_ID, Patient.Class, ED.Disposition,
          ed_adm, ed_dis, inp_adm, inp_dis, er_vs_inp, n) %>%
@@ -219,8 +201,6 @@ s %>%
 
 # inspect_singles
 ```
-
-## Important note about "singleton" patients
 
 2022-04-13 meeting notes.
 
@@ -242,7 +222,7 @@ Because so few have actual inpatient-looking encounters anyway.
 
 # Demographics
 
-```{r tidy demographics}
+```{r tidy demographics, echo=FALSE}
 demog %>%
   mutate(
     mcaid = ! is.na(MEDICAID_NUM),
@@ -259,9 +239,8 @@ demog %>%
 # demographics_tidy %>% head() %>% kable()
 ```
 
-# Descriptives (of demographics)
 
-```{r}
+```{r echo=FALSE}
 # addmargins(table(demographics_tidy$Sex)) %>% kable()
 # table(demographics_tidy$Race) %>% kable()
 # table(demographics_tidy$Ethnic.Group) %>% kable()
@@ -287,7 +266,7 @@ Sum is 3728. 2:1 white:black. Most common employment is retired. Most married.
 ggplot(demographics_tidy, aes(Age)) +   geom_density()
 ```
 
-# Notes
+# Clinical Notes
 
 ```{r}
 notes %>%
@@ -299,13 +278,13 @@ dim(counted_notes)
 
 There are 100 patients for whom we have notes.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 ggplot(counted_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 ```
 
 About 35 have only one note.
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 counted_notes %>%
   filter(note_count > 1) -> multi_notes
 ggplot(multi_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
@@ -316,7 +295,7 @@ Many people have dozens of notes. Plenty have hundreds. A few have thousands(!)
 
 Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME, Tung EL. Negative Patient Descriptors: Documenting Racial Bias In The Electronic Health Record. *Health Aff (Millwood).* 2022;41(2):203-211. doi:10.1377/hlthaff.2021.01423
 
-# Actual text processing
+## Actual text processing
 
 > Fifteen descriptors were selected for inclusion in the analysis: (non-)adherent, aggressive, agitated, angry, challenging, combative, (non-)compliant, confront, (non-)cooperative, defensive, exaggerate, hysterical, (un-)pleasant, refuse, and resist. We adjusted the descriptors to permit identification of alternative grammatical forms (for example, “adher” for “adherent,” “adhere,” or “adhered)
 
@@ -328,10 +307,10 @@ Review this: https://pubmed.ncbi.nlm.nih.gov/35044842/ . Sun M, Oliwa T, Peek ME
 notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
-  select(PAT_ID, NOTE_ID, NOTE_TEXT, abbr, negativity) -> done_searching
+  select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_searching
 ```
 
-```{r}
+```{r message=FALSE, warning=FALSE}
 qplot(done_searching$negativity) + scale_y_log10()
 ```
 
@@ -348,7 +327,7 @@ joined %>%
   write.csv(here('head_analytic.csv'))
 ```
 
-# Tables of negativity vs. various factors
+# RESULTS: negative descriptors vs. demographic factors
 
 ```{r}
 table(joined$Sex, joined$negativity) -> x
