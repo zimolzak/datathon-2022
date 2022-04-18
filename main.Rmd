@@ -7,6 +7,15 @@ output:
   html_document: default
 ---
 
+# Contents
+
+1. Conclusions up front
+2. Import patient visits
+3. Import demographics
+4. Import clinical notes
+5. Make analytic data set
+6. Prelim results
+
 # Conclusions so far
 
 - More women when negative descriptors = 1, but fewer when = 2, 3, 4.
