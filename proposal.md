@@ -1,5 +1,4 @@
-# The association of biased language in medical text with diagnostic
-error
+# The association of biased language in medical text with diagnostic error
 
 **Project team:** Andrew Zimolzak MD MMSc, Traber Giardina Ph.D.
 MSW, Darius Dawson Ph.D., Terri Fletcher Ph.D., Taylor Scott, Debra
