@@ -79,7 +79,7 @@ table(ed_encounter_tidy$ED.Disposition) %>% kable()
 
 ## Skip this section (Andy's notes)
 
-```{r include=FALSE}
+```{r crosstab, include=FALSE}
 table(ed_encounter_tidy$ED.Disposition, ed_encounter_tidy$Patient.Class) %>% kable()
 
 ```
@@ -234,7 +234,7 @@ demog %>%
 # demographics_tidy %>% head() %>% kable()
 ```
 
-```{r echo=FALSE}
+```{r indiv tables obsolete, echo=FALSE}
 # addmargins(table(demographics_tidy$Sex)) %>% kable()
 # table(demographics_tidy$Race) %>% kable()
 # table(demographics_tidy$Ethnic.Group) %>% kable()
@@ -249,19 +249,19 @@ demog %>%
 
 **Observations in brief:** Number of patients is 3728. 2:1 white:black. Most common employment is retired. Most are married. 2:1 nonmedicaid vs yes. Most common financial status is: managed care, or Medicare managed care.
 
-```{r}
+```{r tableone}
   demographics_tidy %>% select(-pat_id) -> tabulate_me
   CreateTableOne(data=tabulate_me) -> t1
   kableone(t1)
 ```
 
-```{r}
+```{r age density}
 ggplot(demographics_tidy, aes(Age)) +   geom_density()
 ```
 
 # Clinical Notes (descriptive stats)
 
-```{r}
+```{r dim notes}
 notes %>%
   group_by(PAT_ID) %>%
   summarise(note_count = n()) -> counted_notes
@@ -271,15 +271,15 @@ dim(counted_notes)
 
 There are 100 patients for whom we have notes.
 
-## Notes per patient
+## Note chunks per patient
 
 ```{r message=FALSE, warning=FALSE}
 ggplot(counted_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 ```
 
-**Figure. Notes per patient.** About 35 patients have only one note.
+**Figure. Notes per patient.** About 35 patients have only one note chunk.
 
-## Zoomed in notes per patient
+## Zoomed in note chunks per patient
 
 ```{r message=FALSE, warning=FALSE}
 counted_notes %>%
@@ -288,7 +288,7 @@ ggplot(multi_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 
 ```
 
-**Figure. Zoomed in notes per patient.** Many people have dozens of notes. Plenty have hundreds. A few have thousands(!)
+**Figure. Zoomed in note chunks per patient.** Many people have dozens of note chunks. Plenty have hundreds. A few have thousands(!)
 
 ## Actual text processing
 
@@ -326,25 +326,28 @@ qplot(summed$negativity) + scale_y_log10()
 
 **Figure. Negative descriptors per note.** There are 10k notes with 0 negative descriptors, 1k with 1, 100 with 3--4, etc.
 
-## Example data
+# Final analytic dataset
 
-```{r analytic dataset, echo=FALSE}
+```{r analytic dataset}
 left_join(summed, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
   select(-abbr) -> joined
-
 write.csv(joined, here('analytic_dataset.csv'))
+names(joined)
+```
 
+```{r samples, echo=FALSE}
 joined %>%
   head() %>%
   write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
   select(-PAT_ID, -NOTE_ID, -mcaid, -mcare) %>%
-  rename(ethnic = Ethnic.Group, employ = Employment.Status, marital = Marital.Status,
-         finance = Financial.Class, interp = interpreter, lang = Language) %>%
+  rename(ethnic = Ethnic.Group, employ = Employment.Status,
+         marital = Marital.Status,
+         finance = Financial.Class,
+         interp = interpreter, lang = Language) %>%
   slice_sample(n=6) %>%
   kable()
-
 ```
 **Table. Example analytic data set.** I printed the outcome variable
 `negativity`, but only a selection of covariates, for simplicity. All covariates
