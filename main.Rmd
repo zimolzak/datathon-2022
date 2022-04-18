@@ -7,6 +7,15 @@ output:
   html_document: default
 ---
 
+# Conclusions so far
+
+- More women when negative descriptors = 1, but fewer when = 2, 3, 4.
+- More Latino patients when negative descriptors = 1 or 2, but fewer when = 3, 4.
+- Fewer black patients when negative descriptors = 1, more when = 2, 3, 4, 5, 6.
+
+No adjustment yet for covariates. To see quantitative association results, go to "RESULTS" section (probably the final 2 pages of the PDF).
+
+
 ```{r libraries, echo=FALSE, message=FALSE, warning=FALSE}
 library(ggplot2)
 library(here)
@@ -262,11 +271,15 @@ dim(counted_notes)
 
 There are 100 patients for whom we have notes.
 
+## Notes per patient
+
 ```{r message=FALSE, warning=FALSE}
 ggplot(counted_notes, aes(note_count)) + geom_histogram() + scale_x_log10()
 ```
 
 **Figure. Notes per patient.** About 35 patients have only one note.
+
+## Zoomed in notes per patient
 
 ```{r message=FALSE, warning=FALSE}
 counted_notes %>%
@@ -329,7 +342,7 @@ joined %>%
   select(-PAT_ID, -NOTE_ID, -mcaid, -mcare) %>%
   rename(ethnic = Ethnic.Group, employ = Employment.Status, marital = Marital.Status,
          finance = Financial.Class, interp = interpreter, lang = Language) %>%
-  slice_sample(n=5) %>%
+  slice_sample(n=6) %>%
   kable()
 
 ```
@@ -342,6 +355,8 @@ are retained in the output CSV files.
 
 In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
+## Sex vs. negative descriptors
+
 ```{r}
 table(joined$Sex, joined$negativity) -> x
 round((x[1,] / x[2,]), 3) -> f.m.ratio
@@ -349,6 +364,8 @@ rbind(x, f.m.ratio) %>% kable()
 ```
 
 **Table. Sex vs. negative descriptors.** More women when negativity = 1.
+
+## Ethnicity vs. negative descriptors
 
 ```{r}
 table(joined$Ethnic.Group, joined$negativity)  -> x
@@ -358,13 +375,15 @@ rbind(x, latino.non.ratio) %>% kable()
 
 **Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
 
+## Race vs. negative descriptors
+
 ```{r}
 table(joined$Race, joined$negativity)  -> x
-round((x[2,] / x[5,]), 3) -> b.w.ratio  # warning, ad-hoc row numbers
+round((x[2,] / x[5,]), 2) -> b.w.ratio  # warning, ad-hoc row numbers
 rbind(x, b.w.ratio) %>% kable()
 ```
 
-**Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2 or 3.
+**Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
 
 # Possible to-do items
 
