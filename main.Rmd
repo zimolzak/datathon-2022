@@ -18,7 +18,7 @@ output:
 
 # Conclusions so far
 
-- More women when negative descriptors = 1, but fewer when = 2, 3, 4.
+- More women when negative descriptors = 1, 2 but fewer when = 3, 4.
 - More Latino patients when negative descriptors = 1 or 2, but fewer when = 3, 4.
 - Fewer black patients when negative descriptors = 1, more when = 2, 3, 4, 5, 6.
 
@@ -240,22 +240,43 @@ demog %>%
   rename(
     interpreter = INTRPTR_NEEDED_YN,
   ) -> demographics_tidy
+
+demographics_tidy %>%
+  arrange(pat_id) %>%
+  group_by(pat_id) %>%
+  summarise(  
+    demog_entries = n(),
+    pat_id = first(pat_id),
+    Sex = first(Sex),
+    Age = first(Age),
+    Ethnic.Group = first(Ethnic.Group),
+    Race = first(Race),
+    Employment.Status = first(Employment.Status),
+    interpreter = first(interpreter),
+    Language = first(Language),
+    Marital.Status = first(Marital.Status),
+    mcaid = first(mcaid),
+    mcare = first(mcare),
+    Financial.Class = first(Financial.Class)
+  ) -> demographics_tidy_rm_dups
+# fixme - probably a way to do w/ less copy/paste, like summarise_all(), etc.
+
 ```
 
 
-**Observations in brief:** Number of patients is 3728. 2:1 white:black. Most common employment is retired. Most are married. 2:1 nonmedicaid vs yes. Most common financial status is: managed care, or Medicare managed care.
+**Observations in brief:** Number of patients is 3494. 2:1 white:black. Most common employment is retired. Most are married. 2:1 nonmedicare vs yes. Most common financial status is: managed care, or Medicare managed care.
 
 ```{r tableone}
-  demographics_tidy %>% select(-pat_id) -> tabulate_me
+  demographics_tidy_rm_dups %>% select(-pat_id) -> tabulate_me
   CreateTableOne(data=tabulate_me) -> t1
   kableone(t1)
 ```
 
 ```{r age density}
-ggplot(demographics_tidy, aes(Age)) +   geom_density()
+ggplot(demographics_tidy_rm_dups, aes(Age)) +   geom_density()
 ```
 
-## Patient IDs with > 1 demographic entry
+## Skip this section (Andy's notes)
 
 
 ```{r plot mult demog, echo=FALSE, message=FALSE, warning=FALSE}
@@ -278,8 +299,9 @@ mult_demog %>%
   filter(n == 4) %>%
   mutate(decade = round(Age, -1)) %>%
   select(-pat_id, -Age) %>%
-  head(n = 12) %>%
-  kable()
+  head(n = 12) -> inspect_mult_demog
+
+# inspect_mult_demog %>%  kable()
 ```
 
 **Table. People with multiple demographic entries.** Seems it is often for multiple financial classes. Sometimes for multiple races, though.
@@ -356,7 +378,7 @@ qplot(summed$negativity) + scale_y_log10()
 # Final analytic dataset
 
 ```{r analytic dataset}
-left_join(summed, demographics_tidy, by = c('PAT_ID' = 'pat_id')) %>%
+left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
   select(-abbr) -> joined
 write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
@@ -393,7 +415,7 @@ round((x[1,] / x[2,]), 3) -> f.m.ratio
 rbind(x, f.m.ratio) %>% kable()
 ```
 
-**Table. Sex vs. negative descriptors.** More women when negativity = 1.
+**Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
 
 ## Ethnicity vs. negative descriptors
 
