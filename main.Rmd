@@ -381,7 +381,13 @@ qplot(summed$negativity) + scale_y_log10()
 
 ```{r analytic dataset}
 left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
-  mutate(negativity_any = (negativity > 0)) %>%
+  mutate(
+    negativity_any = (negativity > 0),
+    race_ethn = case_when(
+      Ethnic.Group == 'Hispanic or Latino' ~ 'Latino',
+      TRUE ~ Race
+    )
+  ) %>%
   select(-abbr) -> joined
 
 write.csv(joined, here('analytic_dataset.csv'))
@@ -395,7 +401,10 @@ joined %>%
   write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
-  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status, -negativity_any) %>%
+  select(
+    -PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status,
+    -negativity_any, -race_ethn
+  ) %>%
   rename(ethnic = Ethnic.Group,
          employ = Employment.Status,
          finance = Financial.Class,
@@ -491,6 +500,24 @@ qplot(x = xvals, y = p_black) +
   geom_hline(yintercept = p_black[1])
 ```
 
+## Combined race/ethnicity vs. negative descriptors
+
+```{r table combo}
+# fixme fixme
+table(joined$race_ethn, joined$negativity) -> x
+
+Total <- colSums(x)
+p_asian <- round(x[1,] / Total, 3)
+p_black <- round(x[2,] / Total, 3)
+p_latino <- round(x[3,] / Total, 3)
+p_white <- round(x[4,] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
+
+unified_table %>% kable()
+```
+
+
 
 # RESULTS more concise
 
@@ -521,6 +548,11 @@ round((x[2,] / total), 3) -> proportion.black
 rbind(x, total, proportion.black) %>% kable()
 ```
 
+# R vs E
+
+```{r}
+table(joined$Race, joined$Ethnic.Group)
+```
 
 
 # To do
