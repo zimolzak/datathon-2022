@@ -233,28 +233,15 @@ demog %>%
     mcare = (MEDICARE_NUM != "")
   ) %>%
   select(
-    pat_id, Sex, Age, Ethnic.Group, Race, Employment.Status,INTRPTR_NEEDED_YN,
+    pat_id, Sex, Age, Ethnic.Group, Race,
+    Employment.Status,INTRPTR_NEEDED_YN,
     Language, Marital.Status, mcaid, mcare, Financial.Class
   ) %>%
   rename(
     interpreter = INTRPTR_NEEDED_YN,
   ) -> demographics_tidy
-
-# demographics_tidy %>% head() %>% kable()
 ```
 
-```{r indiv tables obsolete, echo=FALSE}
-# addmargins(table(demographics_tidy$Sex)) %>% kable()
-# table(demographics_tidy$Race) %>% kable()
-# table(demographics_tidy$Ethnic.Group) %>% kable()
-# table(demographics_tidy$Employment.Status) %>% kable()
-# table(demographics_tidy$interpreter) %>% kable()
-# table(demographics_tidy$Language) %>% kable()
-# table(demographics_tidy$Marital.Status) %>% kable()
-# table(demographics_tidy$mcaid) %>% kable()
-# table(demographics_tidy$mcare) %>% kable()
-# table(demographics_tidy$Financial.Class) %>% kable()
-```
 
 **Observations in brief:** Number of patients is 3728. 2:1 white:black. Most common employment is retired. Most are married. 2:1 nonmedicaid vs yes. Most common financial status is: managed care, or Medicare managed care.
 
@@ -267,6 +254,37 @@ demog %>%
 ```{r age density}
 ggplot(demographics_tidy, aes(Age)) +   geom_density()
 ```
+
+## Patient IDs with > 1 demographic entry
+
+
+```{r plot mult demog, echo=FALSE, message=FALSE, warning=FALSE}
+
+demographics_tidy %>%
+  group_by(pat_id) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) -> demog_rows_per_pt
+
+table(demog_rows_per_pt$n) %>% kable()
+
+```
+
+```{r table mult demog, echo=FALSE}
+left_join(demog_rows_per_pt, demographics_tidy,
+          by="pat_id") -> mult_demog
+
+
+mult_demog %>%
+  filter(n == 4) %>%
+  mutate(decade = round(Age, -1)) %>%
+  select(-pat_id, -Age) %>%
+  head(n = 12) %>%
+  kable()
+```
+
+**Table. People with multiple demographic entries.** Seems it is often for multiple financial classes. Sometimes for multiple races, though.
+
+
 
 # Clinical Notes (descriptive stats)
 
@@ -400,6 +418,7 @@ rbind(x, b.w.ratio) %>% kable()
 # Possible to-do items
 
 -  Variable for "any neg descriptor, Y/N."
+-  Limit only to those discharged from ED to home.
 -  Get complete note data from IT.
 -  Consider showing which descriptor (arrange like doc:term matrix).
 -  Show length distribution of notes.
