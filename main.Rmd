@@ -18,6 +18,8 @@ output:
 
 # Conclusions so far
 
+There are more women (71 vs 63%) and Latino patients (36 vs 22%) represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients (46 vs 50%) represented among notes with any negative descriptor.
+
 - More women when negative descriptors = 1, 2 but fewer when = 3, 4.
 - More Latino patients when negative descriptors = 1 or 2, but fewer when = 3, 4.
 - Fewer black patients when negative descriptors = 1, more when = 2, 3, 4, 5, 6.
@@ -384,17 +386,27 @@ write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
 ```
 
+```{r more concise analytic}
+joined %>%
+  mutate(negativity = (negativity > 0)) %>%
+  filter(Race == 'White or Caucasian' |
+           Race == 'Black or African American') -> analytic_concise
+```
+
+
 ```{r samples, echo=FALSE}
 joined %>%
   head() %>%
   write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
-  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare) %>%
-  rename(ethnic = Ethnic.Group, employ = Employment.Status,
-         marital = Marital.Status,
+  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status) %>%
+  rename(ethnic = Ethnic.Group,
+         employ = Employment.Status,
          finance = Financial.Class,
-         interp = interpreter, lang = Language) %>%
+         interp = interpreter,
+         lang = Language
+  ) %>%
   slice_sample(n=6) %>%
   kable()
 ```
@@ -437,12 +449,43 @@ rbind(x, b.w.ratio) %>% kable()
 
 **Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
 
-# Possible to-do items
+# RESULTS more concise
 
--  Variable for "any neg descriptor, Y/N."
+## Sex
+
+```{r}
+table(analytic_concise$Sex, analytic_concise$negativity) -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+rbind(x, proportion) %>% kable()
+```
+
+
+## Ethnicity
+
+```{r}
+table(analytic_concise$Ethnic.Group, analytic_concise$negativity)  -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+rbind(x, proportion) %>% kable()
+```
+
+
+## Race
+
+```{r}
+table(analytic_concise$Race, analytic_concise$negativity)  -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+rbind(x, proportion) %>% kable()
+```
+
+
+
+# To do
+
+-  Make the proportion out of *all* patients. So $u / N$, instead of $u / (u + p)$.
+-  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
 -  Limit only to those discharged from ED to home.
 -  Get complete note data from IT.
 -  Consider showing which descriptor (arrange like doc:term matrix).
 -  Show length distribution of notes.
 -  Dunning log-likelihood.
--  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
+-  Logistic model
