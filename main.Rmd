@@ -24,7 +24,7 @@ There are more women (71 vs 64%) and Latino patients (36 vs 22%) represented amo
 - More Latino patients when negative descriptors = 1 or 2, but fewer when = 3, 4.
 - Fewer black patients when negative descriptors = 1, more when = 2, 3, 4, 5, 6.
 
-No adjustment yet for covariates. To see quantitative association results, go to "RESULTS" section (probably the final 2 pages of the PDF).
+No adjustment yet for covariates. To see quantitative association results, go to "RESULTS" section (probably the final 4-8 pages of the PDF).
 
 
 ```{r libraries, echo=FALSE, message=FALSE, warning=FALSE}
@@ -602,7 +602,7 @@ round((x[2,] / total), 3) -> proportion.black
 rbind(x, total, proportion.black) %>% kable()
 ```
 
-# R vs E
+# Skip this section (R vs E)
 
 ```{r}
 table(joined$Race, joined$Ethnic.Group)
