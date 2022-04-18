@@ -381,14 +381,11 @@ qplot(summed$negativity) + scale_y_log10()
 
 ```{r analytic dataset}
 left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
+  mutate(negativity_any = (negativity > 0)) %>%
   select(-abbr) -> joined
+
 write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
-```
-
-```{r more concise analytic}
-joined %>%
-  mutate(negativity = (negativity > 0)) -> analytic_concise
 ```
 
 
@@ -398,7 +395,7 @@ joined %>%
   write.csv(here('analytic_dataset_sample.csv'))
 
 joined %>%
-  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status) %>%
+  select(-PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status, -negativity_any) %>%
   rename(ethnic = Ethnic.Group,
          employ = Employment.Status,
          finance = Financial.Class,
@@ -408,9 +405,7 @@ joined %>%
   slice_sample(n=6) %>%
   kable()
 ```
-**Table. Example analytic data set.** I printed the outcome variable
-`negativity`, but only a selection of covariates, for simplicity. All covariates
-are retained in the output CSV files.
+**Table. Example analytic data set.** I printed the outcome variable `negativity`, but only a selection of covariates, for simplicity. There is also a binary outcome variable `negativity_any`. All covariates are retained in the output CSV files.
 
 
 # RESULTS: Negative descriptors vs. demographic factors
@@ -452,7 +447,7 @@ rbind(x, b.w.ratio) %>% kable()
 ## Sex
 
 ```{r}
-table(analytic_concise$Sex, analytic_concise$negativity) -> x
+table(joined$Sex, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
 rbind(x, proportion) %>% kable()
 ```
@@ -461,7 +456,7 @@ rbind(x, proportion) %>% kable()
 ## Ethnicity
 
 ```{r}
-table(analytic_concise$Ethnic.Group, analytic_concise$negativity) -> x
+table(joined$Ethnic.Group, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
 rbind(x, proportion) %>% kable()
 ```
@@ -470,7 +465,7 @@ rbind(x, proportion) %>% kable()
 ## Race
 
 ```{r}
-table(analytic_concise$Race, analytic_concise$negativity) -> x
+table(joined$Race, joined$negativity_any) -> x
 colSums(x) -> total
 round((x[2,] / total), 3) -> proportion.black
 rbind(x, total, proportion.black) %>% kable()
