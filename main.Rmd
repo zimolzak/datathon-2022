@@ -477,6 +477,7 @@ rbind(x, total, proportion.black) %>% kable()
 
 -  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
 -  Limit only to those discharged from ED to home.
+-  More rigorous handling of those with multiple demographic entries.
 -  Get complete note data from IT.
 -  Consider showing which descriptor (arrange like doc:term matrix).
 -  Show length distribution of notes.
