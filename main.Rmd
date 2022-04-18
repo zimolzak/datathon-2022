@@ -386,6 +386,10 @@ left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
     race_ethn = case_when(
       Ethnic.Group == 'Hispanic or Latino' ~ 'Latino',
       TRUE ~ Race
+    ),
+    negativity_binned = case_when(
+      negativity < 3 ~ negativity,
+      TRUE ~ 3
     )
   ) %>%
   select(-abbr) -> joined
@@ -403,7 +407,7 @@ joined %>%
 joined %>%
   select(
     -PAT_ID, -NOTE_ID, -mcaid, -mcare, -demog_entries, -Marital.Status,
-    -negativity_any, -race_ethn
+    -negativity_any, -race_ethn, -negativity_binned
   ) %>%
   rename(ethnic = Ethnic.Group,
          employ = Employment.Status,
@@ -517,6 +521,25 @@ rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
 unified_table %>% kable()
 ```
 
+```{r table combo binned}
+table(joined$race_ethn, joined$negativity_binned) -> x
+
+Total <- colSums(x)
+p_asian <- round(x[1,] / Total, 3)
+p_black <- round(x[2,] / Total, 3)
+p_latino <- round(x[3,] / Total, 3)
+p_white <- round(x[4,] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table_binned
+
+unified_table_binned %>% kable()
+```
+
+
+```{r}
+g <- ggplot(joined, aes(negativity_binned))
+g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
+```
 
 
 # RESULTS more concise
