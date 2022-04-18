@@ -18,7 +18,7 @@ output:
 
 # Conclusions so far
 
-There are more women (71 vs 63%) and Latino patients (36 vs 22%) represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients (46 vs 50%) represented among notes with any negative descriptor.
+There are more women (71 vs 64%) and Latino patients (36 vs 22%) represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients (48 vs 46%) represented among notes with any negative descriptor.
 
 - More women when negative descriptors = 1, 2 but fewer when = 3, 4.
 - More Latino patients when negative descriptors = 1 or 2, but fewer when = 3, 4.
@@ -388,9 +388,7 @@ names(joined)
 
 ```{r more concise analytic}
 joined %>%
-  mutate(negativity = (negativity > 0)) %>%
-  filter(Race == 'White or Caucasian' |
-           Race == 'Black or African American') -> analytic_concise
+  mutate(negativity = (negativity > 0)) -> analytic_concise
 ```
 
 
@@ -463,7 +461,7 @@ rbind(x, proportion) %>% kable()
 ## Ethnicity
 
 ```{r}
-table(analytic_concise$Ethnic.Group, analytic_concise$negativity)  -> x
+table(analytic_concise$Ethnic.Group, analytic_concise$negativity) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
 rbind(x, proportion) %>% kable()
 ```
@@ -472,16 +470,16 @@ rbind(x, proportion) %>% kable()
 ## Race
 
 ```{r}
-table(analytic_concise$Race, analytic_concise$negativity)  -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
-rbind(x, proportion) %>% kable()
+table(analytic_concise$Race, analytic_concise$negativity) -> x
+colSums(x) -> total
+round((x[2,] / total), 3) -> proportion.black
+rbind(x, total, proportion.black) %>% kable()
 ```
 
 
 
 # To do
 
--  Make the proportion out of *all* patients. So $u / N$, instead of $u / (u + p)$.
 -  Do stats like `prop.trend.test` / Cochran-Armitage test for trend.
 -  Limit only to those discharged from ED to home.
 -  Get complete note data from IT.
