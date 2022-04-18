@@ -414,7 +414,7 @@ In these tables, an upward trend in ratio means positive correlation of underpri
 
 ## Sex vs. negative descriptors
 
-```{r table}
+```{r table s}
 table(joined$Sex, joined$negativity) -> x
 round((x[1,] / x[2,]), 3) -> f.m.ratio
 rbind(x, f.m.ratio) %>% kable()
@@ -422,13 +422,13 @@ rbind(x, f.m.ratio) %>% kable()
 
 **Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
 
-```{r trend test}
+```{r trend test s}
 women <- x[1,]
 totals <- x[1,] + x[2,]
 prop.trend.test(women, totals)
 ```
 
-```{r plot, message=FALSE, warning=FALSE}
+```{r plot s, message=FALSE, warning=FALSE}
 xvals = as.numeric(colnames(x))
 p_women = women / totals
 
@@ -440,7 +440,7 @@ qplot(x = xvals, y = p_women) +
 
 ## Ethnicity vs. negative descriptors
 
-```{r table}
+```{r table e}
 table(joined$Ethnic.Group, joined$negativity)  -> x
 round((x[1,] / x[2,]), 3) -> latino.non.ratio
 rbind(x, latino.non.ratio) %>% kable()
@@ -448,13 +448,13 @@ rbind(x, latino.non.ratio) %>% kable()
 
 **Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
 
-```{r trend test}
+```{r trend test e}
 latino <- x[1,]
 totals <- x[1,] + x[2,]
 prop.trend.test(latino, totals)
 ```
 
-```{r plot, message=FALSE, warning=FALSE}
+```{r plot e, message=FALSE, warning=FALSE}
 xvals = as.numeric(colnames(x))
 p_latino = latino / totals
 
