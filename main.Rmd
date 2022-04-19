@@ -343,14 +343,14 @@ Review this: <https://pubmed.ncbi.nlm.nih.gov/35044842/> . Sun M, Oliwa T, Peek 
 
 > A total of 6,818 sentences were classified.
 
-```{r text processing}
+```{r text processing, eval=FALSE, include=FALSE}
 notes %>%
   mutate(negativity = count_descriptors(NOTE_TEXT)) %>%
   mutate(abbr = substr(NOTE_TEXT, 1, 100)) %>%
   select(PAT_ID, NOTE_ID, LINE, NOTE_TEXT, abbr, negativity) -> done_processing
 ```
 
-```{r sum note lines}
+```{r sum note lines, eval=FALSE, include=FALSE}
 done_processing %>%
   arrange(NOTE_ID, LINE) %>%
   group_by(NOTE_ID) %>%
@@ -401,7 +401,7 @@ lines_terms %>%
 
 ## Distribution of neg. descriptors per patient
 
-```{r message=FALSE, warning=FALSE}
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 qplot(summed$negativity) + scale_y_log10()
 ```
 
@@ -415,7 +415,7 @@ qplot(documents_terms$negativity) + scale_y_log10()
 
 # Final analytic dataset
 
-```{r analytic dataset, echo=FALSE}
+```{r analytic dataset, eval=FALSE, include=FALSE}
 left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
   mutate(
     negativity_any = (negativity > 0),
@@ -429,6 +429,9 @@ left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
     )
   ) %>%
   select(-abbr) -> joined
+```
+
+```{r ana-data-2, echo=FALSE}
 
 ## ugly copy/paste
 
@@ -446,7 +449,7 @@ left_join(documents_terms, demographics_tidy_rm_dups) %>%
   ) -> joined_tm
 ```
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
 ```
@@ -457,14 +460,20 @@ names(joined_tm)
 ```
 
 
-```{r samples, echo=FALSE}
+```{r samples, eval=FALSE, include=FALSE}
 joined %>%
   head() %>%
   write.csv(here('analytic_dataset_sample.csv'))
+```
+
+```{r samp2, echo=FALSE}
 
 joined_tm %>%
   head() %>%
   write.csv(here('analytic_dataset_sample_tm.csv'))
+```
+
+```{r print-sample, eval=FALSE, include=FALSE}
 
 joined %>%
   select(
