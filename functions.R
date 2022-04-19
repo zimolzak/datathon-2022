@@ -6,7 +6,7 @@ filename2df <- function(filename) {
 
 descrip <- c('adher', 'aggress', 'agitat', 'angry', 'challenging', 'combative',
              'complian', 'comply', 'confront', 'cooperat', 'defensive',
-             'exaggerate', 'hysterical', 'unpleasant', 'refuse', 'resist')
+             'exaggerat', 'hysterical', 'unpleasant', 'refus', 'resist')
 
 count_descriptors <- function(charvec) {
   n_found = as.numeric(grepl('asdfasdf', charvec))

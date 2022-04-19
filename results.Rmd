@@ -52,8 +52,6 @@ round((x[1,] / x[2,]), 3) -> f.m.ratio  # adhoc
 rbind(x, f.m.ratio) %>% kable()
 ```
 
-**Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
-
 ```{r trend test s}
 women <- x[1,]  # adhoc
 totals <- x[1,] + x[2,]  # adhoc
@@ -69,8 +67,6 @@ table(joined$Ethnic.Group, joined$negativity)  -> x
 round((x[1,] / x[2,]), 3) -> latino.non.ratio  # adhoc
 rbind(x, latino.non.ratio) %>% kable()
 ```
-
-**Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
 
 ```{r trend test e}
 latino <- x[1,]  # adhoc
@@ -88,8 +84,6 @@ table(joined$Race, joined$negativity)  -> x
 round((x['Black or African American',] / x['White or Caucasian',]), 2) -> b.w.ratio
 rbind(x, b.w.ratio) %>% kable()
 ```
-
-**Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
 
 ```{r trend test race}
 black <- x['Black or African American',]
@@ -251,7 +245,7 @@ joined %>%
   select(ends_with('_sum')) %>%
   summarise_all(~ sum(.))
 ```
-
+Challenging = 69, angry = 12, total notes flagged = 80.
 
 # To do
 
