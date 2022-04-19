@@ -28,12 +28,19 @@ No adjustment yet for covariates. To see quantitative association results, go to
 
 Determine which data set we're using. `analytic_dataset.csv` is the first one I made, which counts how many of our ~16 terms occur in each note chunk, and then adds that up. `analytic_dataset_tm.csv` is the more pre-packaged method. Counts the *number of mentions* of each term, per note.
 
-```{r}
+```{r read CSV}
 joined <- read.csv(
   here('analytic_dataset_tm.csv'), sep=",",
   stringsAsFactors = FALSE
 ) 
 ```
+
+```{r write-cleaner-csv, echo=FALSE}
+joined %>%
+  select(-ends_with("_sum"), -n, -demog_entries) %>%
+  write.csv(here('analytic dataset v0xx 2022-04-xx.csv'))
+```
+
 
 In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
