@@ -42,15 +42,7 @@ totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(women, totals)
 ```
 
-```{r plot-s, echo=FALSE, message=FALSE, warning=FALSE}
-xvals = as.numeric(colnames(x))
-p_women = women / totals
 
-qplot(x = xvals, y = p_women) +
-  labs(y='Proportion Women', x='Negative descriptors in note') +
-  geom_line() +
-  geom_hline(yintercept = p_women[1]) + ylim(0,1)
-```
 
 ## Ethnicity vs. negative descriptors
 
@@ -68,15 +60,7 @@ totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(latino, totals)
 ```
 
-```{r plot-e, echo=FALSE, message=FALSE, warning=FALSE}
-xvals = as.numeric(colnames(x))
-p_latino = latino / totals
 
-qplot(x = xvals, y = p_latino) +
-  labs(y='Proportion Latino', x='Negative descriptors in note') +
-  geom_line() +
-  geom_hline(yintercept = p_latino[1]) + ylim(0,1)
-```
 
 
 ## Race vs. negative descriptors
@@ -95,14 +79,27 @@ totals <- colSums(x)
 prop.trend.test(black, totals)
 ```
 
-```{r plot-r, echo=FALSE, message=FALSE, warning=FALSE}
-xvals = as.numeric(colnames(x))
-p_black = black / totals
 
-qplot(x = xvals, y = p_black) +
-  labs(y='Proportion Black', x='Negative descriptors in note') +
+
+## Single proportion line plot
+
+```{r plot-multi-line, echo=FALSE, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+N = length(xvals)
+
+line_plot_me = data.frame(
+  Proportion = c(women / totals, black / totals, latino / totals),
+  Group = c(rep('Women', N), rep('Black', N), rep('Latino', N)),
+  negativity = rep(xvals, 3)
+)
+
+
+ggplot(line_plot_me, aes(x=negativity, y=Proportion, color=Group)) +
+  labs(x='Negative descriptors in note') +
   geom_line() +
-  geom_hline(yintercept = p_black[1]) + ylim(0,1)
+  ylim(0,1)
+
+
 ```
 
 ## Combined race/ethnicity vs. negative descriptors
@@ -230,10 +227,8 @@ table(joined$Race, joined$Ethnic.Group)
 
 # To do
 
--  probably get rid of log scale stacked bar
 -  cut out the "skip this" sections
 -  echo less code
--  All dot/line plots on one set of axes
 -  Logistic model
 -  Dunning log-likelihood.
 -  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
