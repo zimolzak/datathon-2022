@@ -10,6 +10,7 @@ library(ggplot2)
 library(here)
 library(knitr)
 library(dplyr)
+library(ROCR)
 
 source(file=here("functions.R"))
 ```
@@ -37,7 +38,9 @@ joined <- read.csv(
 
 ```{r write-cleaner-csv, echo=FALSE}
 joined %>%
-  select(-ends_with("_sum"), -n, -demog_entries) %>%
+  select(-ends_with("_sum"), -n, -demog_entries) -> out
+
+out %>%
   write.csv(here('analytic dataset v0xx 2022-04-xx.csv'))
 ```
 
@@ -254,12 +257,98 @@ joined %>%
 ```
 Challenging = 69, angry = 12, total notes flagged = 80.
 
+# Logistic
+
+```{r echo=FALSE}
+joined %>%
+  select(
+    -X, -pat_id, -NOTE_ID,
+    -ends_with("_sum"), -n, -demog_entries,
+    -negativity, -negativity_binned
+  ) -> factor_me
+  
+factor_me %>%
+  summarise(
+    across(
+      c(
+        Sex, race_ethn, Employment.Status, interpreter, Language,
+        Marital.Status, mcaid, mcare, Financial.Class
+      ), factor
+    ),
+    Age = Age, negativity_any = negativity_any
+  ) -> logit_me
+```
+
+```{r logistic}
+
+my_model <- glm(negativity_any ~ ., data = logit_me, family = "binomial")
+summary(my_model)
+
+```
+
+```{r}
+plot(my_model)
+```
+
+```{r rocr}
+rocr_pred = prediction(my_model$fitted.values, my_model$y)
+rocr_perf <- performance(rocr_pred, measure = "tpr", x.measure = "fpr")
+auc = performance(rocr_pred, measure = "auc")
+auc@y.values
+```
+
+```{r plot-roc}
+plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
+```
+
+```{r little model}
+little_model <- glm(negativity_any ~ Sex + race_ethn + Age, data = logit_me, family = "binomial")
+summary(little_model)
+```
+
+```{r}
+rocr_pred = prediction(little_model$fitted.values, little_model$y)
+rocr_perf <- performance(rocr_pred, measure = "tpr", x.measure = "fpr")
+auc = performance(rocr_pred, measure = "auc")
+auc@y.values
+```
+
+```{r}
+plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
+```
+
+```{r message=FALSE, warning=FALSE}
+qplot(my_model$fitted.values) + labs(title = 'Big model')
+```
+```{r message=FALSE, warning=FALSE}
+qplot(little_model$fitted.values) + labs(title = 'Little model') + xlim(0, 0.15)
+```
+
+I get the feeling it hates unbalanced classes.
+
+
+## Try neat bar plots
+
+```{r}
+df = data.frame(
+  y=my_model$coefficients,
+  x=names(my_model$coefficients)
+)
+
+ggplot(df, aes(x=y, y=x) ) + geom_col() + scale_x_log10() +
+  geom_vline(xintercept = 1)
+
+```
+
+
 # To do
 
 -  Trend test on 3 rows of the "combined" `race_ethn` table.
--  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
--  Logistic model
+-  Ordinary $\chi^2$ tests on the $2 \times 2$ tables.
 -  Dunning log-likelihood.
+
+## Probably won't do
+
 -  Limit only to those discharged from ED to home.
 -  More rigorous handling of those with multiple demographic entries.
 -  Get complete note data from IT.
