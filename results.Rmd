@@ -18,6 +18,8 @@ source(file=here("functions.R"))
 
 There are more women and Latino patients represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients represented among notes with any negative descriptor.
 
+Pretty sensitive to phrasing of descriptors. "Unpleasant" results in far fewer notes. Also it means more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
+
 No adjustment yet for covariates. To see quantitative association results, go to "RESULTS" section (probably the final 4-8 pages of the PDF).
 
 
