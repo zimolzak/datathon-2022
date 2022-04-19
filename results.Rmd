@@ -249,6 +249,7 @@ Challenging = 69, angry = 12, total notes flagged = 80.
 
 # To do
 
+-  Trend test on 3 rows of the "combined" `race_ethn` table.
 -  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
 -  Logistic model
 -  Dunning log-likelihood.

@@ -5,16 +5,16 @@ filename2df <- function(filename) {
 }
 
 descrip <- c(
-  'adhere', 'adherence', 'adhering', 'adherent', 'nonadherent', 'non-adherent',
+  'adhere', 'adherence', 'adhering', 'adherent', 'nonadherent', 'non-adherent', 'adheres',
   'aggressive', 'agitated', 'angry', 'challenging', 'combative',
-  'compliance', 'comply', 'compliant', 'complying', 'noncompliant', 'non-compliant', 'noncompliance', 'non-compliance',
-  'confront',
+  'compliance', 'comply', 'compliant', 'complying', 'noncompliant', 'non-compliant', 'noncompliance', 'non-compliance', 'complies',
+  'confront', 'confrontational',
   'cooperate', 'cooperating', 'uncooperative', 'noncooperative', 'non-cooperative',
   'defensive',
-  'exaggerate', 'exaggerating', 'exaggerated',
+  'exaggerate', 'exaggerating', 'exaggerated', 'exaggerates',
   'hysterical', 'unpleasant',
-  'refuse', 'refusing',
-  'resist', 'resisting', 'resisted'
+  'refuse', 'refusing', 'refused', 'refuses',
+  'resist', 'resisting', 'resisted', 'resists'
 )
 
 # (non-)adherent, aggressive, agitated, angry, challenging, combative,
