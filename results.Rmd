@@ -15,21 +15,7 @@ library(ROCR)
 source(file=here("functions.R"))
 ```
 
-# Conclusions so far
-
-There are more women and Latino patients represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients represented among notes with any negative descriptor.
-
-See especially the section near the end called **RESULTS more concise.** This has tables, hypothesis tests, and one stacked bar plot.
-
-The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
-
-
-
-# RESULTS: Negative descriptors vs. demographic factors
-
-Determine which data set we're using. `analytic_dataset.csv` is the first one I made, which counts how many of our ~16 terms occur in each note chunk, and then adds that up. `analytic_dataset_tm.csv` is the more pre-packaged method. Counts the *number of mentions* of each term, per note.
-
-```{r read CSV}
+```{r read CSV, echo=FALSE}
 joined <- read.csv(
   here('analytic_dataset_tm.csv'), sep=",",
   stringsAsFactors = FALSE
@@ -44,15 +30,91 @@ out %>%
   write.csv(here('analytic dataset v0xx 2022-04-xx.csv'))
 ```
 
+# Conclusions so far
 
-In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
+There are more women and Latino patients represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients represented among notes with any negative descriptor.
 
-## Our list of descriptors
+The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
 
-```{r}
-descrip
+
+
+
+# RESULTS
+
+## Combined race/ethnicity
+
+```{r areaplot-any, echo=FALSE, message=FALSE, warning=FALSE}
+joined %>%
+  select(race_ethn, negativity_any) %>%
+  group_by(race_ethn, negativity_any) %>%
+  summarise(tot = n()) %>%
+  arrange(negativity_any, race_ethn) -> race_neg_count
+
+joined %>%
+  group_by(negativity_any) %>%
+  summarise(grand_tot = n()) -> neg_count
+
+left_join(neg_count, race_neg_count, by="negativity_any") %>%
+  mutate(proportion = tot / grand_tot) -> stack_plot_me
+
+ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn)) -> final_plot
+
+final_plot
 ```
 
+```{r, echo=FALSE}
+table(joined$race_ethn, joined$negativity_any) -> final_race
+final_race %>% kable()
+```
+
+```{r fisher, echo=FALSE}
+fisher.test(final_race) -> final_race_t
+final_race_t
+```
+
+## Sex
+
+```{r, echo=FALSE}
+table(joined$Sex, joined$negativity_any) -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
+rbind(x, proportion) %>% kable()
+```
+
+```{r fisher-sex, echo=FALSE}
+fisher.test(x)
+```
+
+## Ethnicity
+
+```{r, echo=FALSE}
+table(joined$Ethnic.Group, joined$negativity_any) -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
+rbind(x, proportion) %>% kable()
+```
+
+```{r fisher-ethn, echo=FALSE}
+fisher.test(x)
+```
+
+## Race
+
+```{r, echo=FALSE}
+table(joined$Race, joined$negativity_any) -> x
+colSums(x) -> total
+round((x['Black or African American',] / total), 3) -> proportion.black
+rbind(x, total, proportion.black) %>% kable()
+```
+
+```{r fisher-race, echo=FALSE}
+fisher.test(x)
+```
+
+
+
+
+# Results (too detailed)
+
+In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
 ## Sex vs. negative descriptors
 
@@ -68,8 +130,6 @@ totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(women, totals)
 ```
 
-
-
 ## Ethnicity vs. negative descriptors
 
 ```{r table e}
@@ -84,9 +144,6 @@ totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(latino, totals)
 ```
 
-
-
-
 ## Race vs. negative descriptors
 
 ```{r table race}
@@ -100,8 +157,6 @@ black <- x['Black or African American',]
 totals <- colSums(x)
 prop.trend.test(black, totals)
 ```
-
-
 
 ## Single proportion line plot
 
@@ -123,6 +178,9 @@ ggplot(line_plot_me, aes(x=negativity, y=Proportion, color=Group)) +
 
 
 ```
+
+
+
 
 # Combined race/ethnicity vs. negative descriptors
 
@@ -154,7 +212,6 @@ prop.trend.test(x['Latino',], Total)
 prop.trend.test(x['Black or African American',], Total)
 ```
 
-
 ## With a "cap" on negativity
 
 ```{r table combo binned, echo=FALSE}
@@ -170,8 +227,6 @@ rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table_binned
 
 unified_table_binned %>% kable()
 ```
-
-
 
 ```{r areaplot, echo=FALSE, message=FALSE, warning=FALSE}
 joined %>%
@@ -219,99 +274,11 @@ prop.trend.test(x['Black or African American',], Total)
 ```
 
 
-# RESULTS more concise
 
-
-## Combined race/ethnicity
-
-```{r areaplot-any, echo=FALSE, message=FALSE, warning=FALSE}
-joined %>%
-  select(race_ethn, negativity_any) %>%
-  group_by(race_ethn, negativity_any) %>%
-  summarise(tot = n()) %>%
-  arrange(negativity_any, race_ethn) -> race_neg_count
-
-joined %>%
-  group_by(negativity_any) %>%
-  summarise(grand_tot = n()) -> neg_count
-
-left_join(neg_count, race_neg_count, by="negativity_any") %>%
-  mutate(proportion = tot / grand_tot) -> stack_plot_me
-
-
-ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn)) -> final_plot
-
-final_plot
-```
-
-
-```{r, echo=FALSE}
-table(joined$race_ethn, joined$negativity_any) -> final_race
-final_race %>% kable()
-```
-```{r fisher, echo=FALSE}
-fisher.test(final_race) -> final_race_t
-final_race_t
-```
-
-
-
-
-## Sex
-
-```{r, echo=FALSE}
-table(joined$Sex, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
-rbind(x, proportion) %>% kable()
-```
-```{r fisher-sex, echo=FALSE}
-fisher.test(x)
-```
-
-
-## Ethnicity
-
-```{r, echo=FALSE}
-table(joined$Ethnic.Group, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
-rbind(x, proportion) %>% kable()
-```
-
-```{r fisher-ethn, echo=FALSE}
-fisher.test(x)
-```
-
-## Race
-
-```{r, echo=FALSE}
-table(joined$Race, joined$negativity_any) -> x
-colSums(x) -> total
-round((x['Black or African American',] / total), 3) -> proportion.black
-rbind(x, total, proportion.black) %>% kable()
-```
-
-```{r fisher-race, echo=FALSE}
-fisher.test(x)
-```
-
-# Skip this section (R vs E)
-
-```{r}
-table(joined$Race, joined$Ethnic.Group)
-```
-
-
-# Most common negative descriptors
-
-
-```{r}
-joined %>%
-  select(ends_with('_sum')) %>%
-  summarise_all(~ sum(.))
-```
-Challenging = 69, angry = 12, total notes flagged = 80.
 
 # Logistic
+
+## Big model
 
 ```{r echo=FALSE}
 joined %>%
@@ -355,6 +322,8 @@ auc@y.values
 plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
 ```
 
+## Little model
+
 ```{r little model}
 little_model <- glm(negativity_any ~ Sex + race_ethn + Age, data = logit_me, family = "binomial")
 summary(little_model)
@@ -371,17 +340,19 @@ auc@y.values
 plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
 ```
 
+## Predicted probabilities, big vs. little
+
 ```{r message=FALSE, warning=FALSE}
 qplot(my_model$fitted.values) + labs(title = 'Big model')
 ```
+
 ```{r message=FALSE, warning=FALSE}
 qplot(little_model$fitted.values) + labs(title = 'Little model') + xlim(0, 0.15)
 ```
 
 I get the feeling it hates unbalanced classes.
 
-
-## Try neat bar plots
+## Try column plot of coefficients
 
 ```{r}
 df = data.frame(
@@ -395,10 +366,11 @@ ggplot(df, aes(x=y, y=x) ) + geom_col() + scale_x_log10() +
 ```
 
 
+
+
 # To do
 
 -  Dunning log-likelihood.
--  More repeatable results summary at end
 
 ## Probably won't do
 
