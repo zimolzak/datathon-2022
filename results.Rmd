@@ -68,33 +68,35 @@ final_race %>% kable()
 ```
 
 ```{r fisher, echo=FALSE}
-fisher.test(final_race) -> final_race_t
-final_race_t
+fisher.test(final_race)[["p.value"]] -> final_race_p
 ```
+$P = $ `r final_race_p`
 
 ## Sex
 
 ```{r, echo=FALSE}
 table(joined$Sex, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
-rbind(x, proportion) %>% kable()
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion.f  # adhoc
+rbind(x, proportion.f) %>% kable()
 ```
 
 ```{r fisher-sex, echo=FALSE}
-fisher.test(x)
+fisher.test(x)[["p.value"]] -> sex_p
 ```
+$P = $ `r sex_p`
 
 ## Ethnicity
 
 ```{r, echo=FALSE}
 table(joined$Ethnic.Group, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
-rbind(x, proportion) %>% kable()
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion.lat  # adhoc
+rbind(x, proportion.lat) %>% kable()
 ```
 
 ```{r fisher-ethn, echo=FALSE}
-fisher.test(x)
+fisher.test(x)[["p.value"]] -> ethn_p
 ```
+$P = $ `r ethn_p`
 
 ## Race
 
@@ -106,8 +108,9 @@ rbind(x, total, proportion.black) %>% kable()
 ```
 
 ```{r fisher-race, echo=FALSE}
-fisher.test(x)
+fisher.test(x)[['p.value']] -> race_alone_p
 ```
+$P = $ `r race_alone_p`
 
 
 
@@ -307,9 +310,7 @@ summary(my_model)
 
 ```
 
-```{r}
-plot(my_model)
-```
+## ROC curve
 
 ```{r rocr}
 rocr_pred = prediction(my_model$fitted.values, my_model$y)
@@ -328,6 +329,8 @@ plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
 little_model <- glm(negativity_any ~ Sex + race_ethn + Age, data = logit_me, family = "binomial")
 summary(little_model)
 ```
+
+## ROC curve
 
 ```{r}
 rocr_pred = prediction(little_model$fitted.values, little_model$y)
