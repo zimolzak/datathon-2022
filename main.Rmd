@@ -457,7 +457,7 @@ names(joined)
 ```
 
 ```{r}
-write.csv(joined, here('analytic_dataset_tm.csv'))
+write.csv(joined_tm, here('analytic_dataset_tm.csv'))
 names(joined_tm)
 ```
 
