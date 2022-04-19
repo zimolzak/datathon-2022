@@ -363,19 +363,23 @@ done_processing %>%
 
 
 
-## Text mining R package
 
-```{r text mining}
+```{r text-mine-preprocess}
 corpus <- VCorpus(VectorSource(notes$NOTE_TEXT))  # fixme - consider SimpleCorpus?
 corpus <- tm_map(corpus, stripWhitespace)
 corpus <- tm_map(corpus, content_transformer(tolower))
 
 # lapply(corpus[2], as.character)
 # corpus <- tm_map(corpus, stemDocument)  # not convinced of fidelity
+```
+
+```{r text-mine-dtm}
 
 dtm <- DocumentTermMatrix(corpus, list(dictionary = descrip))
 # `descrip` comes from functions.R.
+```
 
+```{r text-mine-merge}
 notes %>% select(PAT_ID, NOTE_ID, LINE) -> notes_metadata
 cbind(notes_metadata, as.matrix(dtm)) %>%
   arrange(PAT_ID, NOTE_ID, LINE) -> lines_terms
