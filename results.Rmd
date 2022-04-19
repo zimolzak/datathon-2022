@@ -243,6 +243,16 @@ table(joined$Race, joined$Ethnic.Group)
 ```
 
 
+# Most common negative descriptors
+
+
+```{r}
+joined %>%
+  select(ends_with('_sum')) %>%
+  summarise_all(~ sum(.))
+```
+
+
 # To do
 
 -  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
