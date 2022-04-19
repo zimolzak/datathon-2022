@@ -19,9 +19,9 @@ source(file=here("functions.R"))
 
 There are more women and Latino patients represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients represented among notes with any negative descriptor.
 
-Pretty sensitive to phrasing of descriptors. "Unpleasant" results in far fewer notes. Also it means more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
+See especially the section near the end called **RESULTS more concise.** This has tables, hypothesis tests, and one stacked bar plot.
 
-No adjustment yet for covariates. To see quantitative association results, go to "RESULTS" section (probably the final 4-8 pages of the PDF).
+The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
 
 
 
@@ -124,9 +124,9 @@ ggplot(line_plot_me, aes(x=negativity, y=Proportion, color=Group)) +
 
 ```
 
-## Combined race/ethnicity vs. negative descriptors
+# Combined race/ethnicity vs. negative descriptors
 
-*Without* a "cap" on negativity:
+## Without a "cap" on negativity
 
 ```{r table combo, echo=FALSE}
 table(joined$race_ethn, joined$negativity) -> x
@@ -142,7 +142,20 @@ rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
 unified_table %>% kable()
 ```
 
-*With* a "cap" on negativity:
+```{r trend-test-re-nocap-w}
+prop.trend.test(x['White or Caucasian',], Total)
+```
+
+```{r trend-test-re-nocap-L}
+prop.trend.test(x['Latino',], Total)
+```
+
+```{r trend-test-re-nocap-b}
+prop.trend.test(x['Black or African American',], Total)
+```
+
+
+## With a "cap" on negativity
 
 ```{r table combo binned, echo=FALSE}
 table(joined$race_ethn, joined$negativity_binned) -> x
@@ -192,6 +205,25 @@ ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
   geom_hline(yintercept = refwh)
 ```
 
+
+```{r trend-test-re-w}
+prop.trend.test(x['White or Caucasian',], Total)
+```
+
+```{r trend-test-re-L}
+prop.trend.test(x['Latino',], Total)
+```
+
+```{r trend-test-re-b}
+prop.trend.test(x['Black or African American',], Total)
+```
+
+
+# RESULTS more concise
+
+
+## Combined race/ethnicity
+
 ```{r areaplot-any, echo=FALSE, message=FALSE, warning=FALSE}
 joined %>%
   select(race_ethn, negativity_any) %>%
@@ -207,37 +239,59 @@ left_join(neg_count, race_neg_count, by="negativity_any") %>%
   mutate(proportion = tot / grand_tot) -> stack_plot_me
 
 
-ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn))
+ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn)) -> final_plot
+
+final_plot
 ```
 
 
-# RESULTS more concise
+```{r, echo=FALSE}
+table(joined$race_ethn, joined$negativity_any) -> final_race
+final_race %>% kable()
+```
+```{r fisher, echo=FALSE}
+fisher.test(final_race) -> final_race_t
+final_race_t
+```
+
+
+
 
 ## Sex
 
-```{r}
+```{r, echo=FALSE}
 table(joined$Sex, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
 rbind(x, proportion) %>% kable()
+```
+```{r fisher-sex, echo=FALSE}
+fisher.test(x)
 ```
 
 
 ## Ethnicity
 
-```{r}
+```{r, echo=FALSE}
 table(joined$Ethnic.Group, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
 rbind(x, proportion) %>% kable()
 ```
 
+```{r fisher-ethn, echo=FALSE}
+fisher.test(x)
+```
 
 ## Race
 
-```{r}
+```{r, echo=FALSE}
 table(joined$Race, joined$negativity_any) -> x
 colSums(x) -> total
 round((x['Black or African American',] / total), 3) -> proportion.black
 rbind(x, total, proportion.black) %>% kable()
+```
+
+```{r fisher-race, echo=FALSE}
+fisher.test(x)
 ```
 
 # Skip this section (R vs E)
@@ -343,9 +397,8 @@ ggplot(df, aes(x=y, y=x) ) + geom_col() + scale_x_log10() +
 
 # To do
 
--  Trend test on 3 rows of the "combined" `race_ethn` table.
--  Ordinary $\chi^2$ tests on the $2 \times 2$ tables.
 -  Dunning log-likelihood.
+-  More repeatable results summary at end
 
 ## Probably won't do
 
