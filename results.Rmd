@@ -70,7 +70,8 @@ final_race %>% kable()
 ```{r fisher, echo=FALSE}
 fisher.test(final_race)[["p.value"]] -> final_race_p
 ```
-$P = $ `r final_race_p`
+
+*P* = `r final_race_p`
 
 ## Sex
 
@@ -83,7 +84,7 @@ rbind(x, proportion.f) %>% kable()
 ```{r fisher-sex, echo=FALSE}
 fisher.test(x)[["p.value"]] -> sex_p
 ```
-$P = $ `r sex_p`
+*P* = `r sex_p`
 
 ## Ethnicity
 
@@ -96,7 +97,7 @@ rbind(x, proportion.lat) %>% kable()
 ```{r fisher-ethn, echo=FALSE}
 fisher.test(x)[["p.value"]] -> ethn_p
 ```
-$P = $ `r ethn_p`
+*P* = `r ethn_p`
 
 ## Race
 
@@ -110,7 +111,19 @@ rbind(x, total, proportion.black) %>% kable()
 ```{r fisher-race, echo=FALSE}
 fisher.test(x)[['p.value']] -> race_alone_p
 ```
-$P = $ `r race_alone_p`
+*P* = `r race_alone_p`
+
+
+
+# CONCLUSION (narrative)
+
+There are more women (`r proportion.f[2]*100` vs. `r proportion.f[1]*100` percent) represented among notes containing any negative descriptor, compared to notes without a negative descriptor (*P* = `r sex_p`).
+
+There are more Latino patients (`r proportion.lat[2]*100` vs. `r proportion.lat[1]*100` percent) than non-Latinos represented among notes containing any negative descriptor (*P* = `r ethn_p`).
+
+There are *slightly* more black patients (`r proportion.black[2]*100` vs. `r proportion.black[1]*100` percent) represented among notes with any negative descriptor (*P* = `r race_alone_p`).
+
+Considering the *combination* of race and ethnicity fields, (that is, with the major groups being black, Latino, and white non-Latino,) there is a significant difference in distribution of groups between notes with vs. without a negative descriptor (*P* = `r final_race_p`).
 
 
 
