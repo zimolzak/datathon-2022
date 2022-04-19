@@ -14,7 +14,7 @@ library(dplyr)
 
 # RESULTS: Negative descriptors vs. demographic factors
 
-Determine which data set we're using. `joined` is the first one I made, which counts how many of our ~16 terms occur in each note chunk, and then adds that up. `joined_tm` is the more pre-packaged method. Counts the *number of mentions* of each term, per note.
+Determine which data set we're using. `analytic_dataset.csv` is the first one I made, which counts how many of our ~16 terms occur in each note chunk, and then adds that up. `analytic_dataset_tm.csv` is the more pre-packaged method. Counts the *number of mentions* of each term, per note.
 
 ```{r}
 joined <- read.csv(
@@ -30,15 +30,15 @@ In these tables, an upward trend in ratio means positive correlation of underpri
 
 ```{r table s}
 table(joined$Sex, joined$negativity) -> x
-round((x[1,] / x[2,]), 3) -> f.m.ratio
+round((x[1,] / x[2,]), 3) -> f.m.ratio  # adhoc
 rbind(x, f.m.ratio) %>% kable()
 ```
 
 **Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
 
 ```{r trend test s}
-women <- x[1,]
-totals <- x[1,] + x[2,]
+women <- x[1,]  # adhoc
+totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(women, totals)
 ```
 
@@ -56,15 +56,15 @@ qplot(x = xvals, y = p_women) +
 
 ```{r table e}
 table(joined$Ethnic.Group, joined$negativity)  -> x
-round((x[1,] / x[2,]), 3) -> latino.non.ratio
+round((x[1,] / x[2,]), 3) -> latino.non.ratio  # adhoc
 rbind(x, latino.non.ratio) %>% kable()
 ```
 
 **Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
 
 ```{r trend test e}
-latino <- x[1,]
-totals <- x[1,] + x[2,]
+latino <- x[1,]  # adhoc
+totals <- x[1,] + x[2,]  # adhoc
 prop.trend.test(latino, totals)
 ```
 
@@ -83,14 +83,14 @@ qplot(x = xvals, y = p_latino) +
 
 ```{r table}
 table(joined$Race, joined$negativity)  -> x
-round((x[2,] / x[5,]), 2) -> b.w.ratio  # warning, ad-hoc row numbers
+round((x['Black or African American',] / x['White or Caucasian',]), 2) -> b.w.ratio
 rbind(x, b.w.ratio) %>% kable()
 ```
 
 **Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
 
 ```{r trend test}
-black <- x[2,]  # warning - ad hoc row numbers again
+black <- x['Black or African American',]
 totals <- colSums(x)
 prop.trend.test(black, totals)
 ```
@@ -107,28 +107,32 @@ qplot(x = xvals, y = p_black) +
 
 ## Combined race/ethnicity vs. negative descriptors
 
+*Without* a "cap" on negativity:
+
 ```{r table combo, echo=FALSE}
 table(joined$race_ethn, joined$negativity) -> x
 
 Total <- colSums(x)
-p_asian <- round(x[1,] / Total, 3)
-p_black <- round(x[2,] / Total, 3)
-p_latino <- round(x[3,] / Total, 3)
-p_white <- round(x[4,] / Total, 3)
+p_asian <- round(x['Asian',] / Total, 3)
+p_black <- round(x['Black or African American',] / Total, 3)
+p_latino <- round(x['Latino',] / Total, 3)
+p_white <- round(x['White or Caucasian',] / Total, 3)
 
 rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
 
 unified_table %>% kable()
 ```
 
+*With* a "cap" on negativity:
+
 ```{r table combo binned, echo=FALSE}
 table(joined$race_ethn, joined$negativity_binned) -> x
 
 Total <- colSums(x)
-p_asian <- round(x[1,] / Total, 3)
-p_black <- round(x[2,] / Total, 3)
-p_latino <- round(x[3,] / Total, 3)
-p_white <- round(x[4,] / Total, 3)
+p_asian <- round(x['Asian',] / Total, 3)
+p_black <- round(x['Black or African American',] / Total, 3)
+p_latino <- round(x['Latino',] / Total, 3)
+p_white <- round(x['White or Caucasian',] / Total, 3)
 
 rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table_binned
 
@@ -136,12 +140,20 @@ unified_table_binned %>% kable()
 ```
 
 
-```{r echo=FALSE}
+```{r stackbar, echo=FALSE}
 g <- ggplot(joined, aes(negativity_binned))
 g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
 ```
 
-```{r create-interesting, echo=FALSE, message=FALSE, warning=FALSE}
+It's not really clear what a log scale on a stacked bar plot *shows.* It makes the 44 `NA` race patients (just 1 pat_id who wasn't in demographic table) look *huge* in number. Also it's telling me that I have $10^{15}$ patient notes, which is absurd!
+
+```{r stackbar2, echo=FALSE}
+ggplot(joined, aes(negativity_any)) +
+  geom_bar(aes(fill = race_ethn)) +
+  scale_y_log10()
+```
+
+```{r areaplot, echo=FALSE, message=FALSE, warning=FALSE}
 joined %>%
   select(race_ethn, negativity_binned) %>%
   group_by(race_ethn, negativity_binned) %>%
@@ -173,6 +185,24 @@ ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
   geom_hline(yintercept = refwh)
 ```
 
+```{r areaplot-any, echo=FALSE, message=FALSE, warning=FALSE}
+joined %>%
+  select(race_ethn, negativity_any) %>%
+  group_by(race_ethn, negativity_any) %>%
+  summarise(tot = n()) %>%
+  arrange(negativity_any, race_ethn) -> race_neg_count
+
+joined %>%
+  group_by(negativity_any) %>%
+  summarise(grand_tot = n()) -> neg_count
+
+left_join(neg_count, race_neg_count, by="negativity_any") %>%
+  mutate(proportion = tot / grand_tot) -> stack_plot_me
+
+
+ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn))
+```
+
 
 # RESULTS more concise
 
@@ -180,7 +210,7 @@ ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
 
 ```{r}
 table(joined$Sex, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
 rbind(x, proportion) %>% kable()
 ```
 
@@ -189,7 +219,7 @@ rbind(x, proportion) %>% kable()
 
 ```{r}
 table(joined$Ethnic.Group, joined$negativity_any) -> x
-round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion  # adhoc
 rbind(x, proportion) %>% kable()
 ```
 
@@ -199,7 +229,7 @@ rbind(x, proportion) %>% kable()
 ```{r}
 table(joined$Race, joined$negativity_any) -> x
 colSums(x) -> total
-round((x[2,] / total), 3) -> proportion.black
+round((x['Black or African American',] / total), 3) -> proportion.black
 rbind(x, total, proportion.black) %>% kable()
 ```
 
@@ -212,6 +242,7 @@ table(joined$Race, joined$Ethnic.Group)
 
 # To do
 
+-  probably get rid of log scale stacked bar
 -  cut out the "skip this" sections
 -  echo less code
 -  All dot/line plots on one set of axes
