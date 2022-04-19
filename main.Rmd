@@ -556,8 +556,8 @@ rbind(x, b.w.ratio) %>% kable()
 **Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
 
 ```{r trend test}
-black <- x[1,]
-totals <- x[1,] + x[2,]
+black <- x[2,]  # warning - ad hoc row numbers again
+totals <- colSums(x)
 prop.trend.test(black, totals)
 ```
 
@@ -678,6 +678,8 @@ table(joined$Race, joined$Ethnic.Group)
 
 # To do
 
+-  cut out the "skip this" sections
+-  echo less code
 -  All dot/line plots on one set of axes
 -  Logistic model
 -  Dunning log-likelihood.
