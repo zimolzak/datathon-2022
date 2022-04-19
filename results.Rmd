@@ -10,6 +10,8 @@ library(ggplot2)
 library(here)
 library(knitr)
 library(dplyr)
+
+source(file=here("functions.R"))
 ```
 
 # RESULTS: Negative descriptors vs. demographic factors
@@ -23,8 +25,14 @@ joined <- read.csv(
 ) 
 ```
 
-
 In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
+
+## Our list of descriptors
+
+```{r}
+descrip
+```
+
 
 ## Sex vs. negative descriptors
 
