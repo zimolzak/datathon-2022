@@ -1,0 +1,225 @@
+---
+title: "BCM Datathon Team 17 Results"
+author: "Andrew Zimolzak, MD, MMSc"
+date: 'April, 2022'
+output: pdf_document
+---
+
+```{r libraries, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(here)
+library(knitr)
+library(dplyr)
+```
+
+# RESULTS: Negative descriptors vs. demographic factors
+
+Determine which data set we're using. `joined` is the first one I made, which counts how many of our ~16 terms occur in each note chunk, and then adds that up. `joined_tm` is the more pre-packaged method. Counts the *number of mentions* of each term, per note.
+
+```{r}
+joined <- read.csv(
+  here('analytic_dataset_tm.csv'), sep=",",
+  stringsAsFactors = FALSE
+) 
+```
+
+
+In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
+
+## Sex vs. negative descriptors
+
+```{r table s}
+table(joined$Sex, joined$negativity) -> x
+round((x[1,] / x[2,]), 3) -> f.m.ratio
+rbind(x, f.m.ratio) %>% kable()
+```
+
+**Table. Sex vs. negative descriptors.** More women when negativity = 1 or 2.
+
+```{r trend test s}
+women <- x[1,]
+totals <- x[1,] + x[2,]
+prop.trend.test(women, totals)
+```
+
+```{r plot-s, echo=FALSE, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_women = women / totals
+
+qplot(x = xvals, y = p_women) +
+  labs(y='Proportion Women', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_women[1])
+```
+
+## Ethnicity vs. negative descriptors
+
+```{r table e}
+table(joined$Ethnic.Group, joined$negativity)  -> x
+round((x[1,] / x[2,]), 3) -> latino.non.ratio
+rbind(x, latino.non.ratio) %>% kable()
+```
+
+**Table. Latino ethnicity vs. negative descriptors.** More latino when negativity = 1 or 2.
+
+```{r trend test e}
+latino <- x[1,]
+totals <- x[1,] + x[2,]
+prop.trend.test(latino, totals)
+```
+
+```{r plot-e, echo=FALSE, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_latino = latino / totals
+
+qplot(x = xvals, y = p_latino) +
+  labs(y='Proportion Latino', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_latino[1])
+```
+
+
+## Race vs. negative descriptors
+
+```{r table}
+table(joined$Race, joined$negativity)  -> x
+round((x[2,] / x[5,]), 2) -> b.w.ratio  # warning, ad-hoc row numbers
+rbind(x, b.w.ratio) %>% kable()
+```
+
+**Table. Race vs. negative descriptors.** Fewer AA when negativity = 1, more when = 2, 3, 4, 5, 6.
+
+```{r trend test}
+black <- x[2,]  # warning - ad hoc row numbers again
+totals <- colSums(x)
+prop.trend.test(black, totals)
+```
+
+```{r plot, echo=FALSE, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+p_black = black / totals
+
+qplot(x = xvals, y = p_black) +
+  labs(y='Proportion Black', x='Negative descriptors in note') +
+  geom_line() +
+  geom_hline(yintercept = p_black[1])
+```
+
+## Combined race/ethnicity vs. negative descriptors
+
+```{r table combo, echo=FALSE}
+table(joined$race_ethn, joined$negativity) -> x
+
+Total <- colSums(x)
+p_asian <- round(x[1,] / Total, 3)
+p_black <- round(x[2,] / Total, 3)
+p_latino <- round(x[3,] / Total, 3)
+p_white <- round(x[4,] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
+
+unified_table %>% kable()
+```
+
+```{r table combo binned, echo=FALSE}
+table(joined$race_ethn, joined$negativity_binned) -> x
+
+Total <- colSums(x)
+p_asian <- round(x[1,] / Total, 3)
+p_black <- round(x[2,] / Total, 3)
+p_latino <- round(x[3,] / Total, 3)
+p_white <- round(x[4,] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table_binned
+
+unified_table_binned %>% kable()
+```
+
+
+```{r echo=FALSE}
+g <- ggplot(joined, aes(negativity_binned))
+g + geom_bar(aes(fill = race_ethn)) + scale_y_log10()
+```
+
+```{r create-interesting, echo=FALSE, message=FALSE, warning=FALSE}
+joined %>%
+  select(race_ethn, negativity_binned) %>%
+  group_by(race_ethn, negativity_binned) %>%
+  summarise(tot = n()) %>%
+  arrange(negativity_binned, race_ethn) -> race_neg_count
+
+joined %>%
+  group_by(negativity_binned) %>%
+  summarise(grand_tot = n()) -> neg_count
+
+left_join(neg_count, race_neg_count, by="negativity_binned") %>%
+  mutate(proportion = tot / grand_tot) -> stack_plot_me
+
+stack_plot_me %>%
+  filter(race_ethn == 'Black or African American' & negativity_binned == 0) -> out
+refaa <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'Latino' & negativity_binned == 0) -> out
+refla <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'White or Caucasian' & negativity_binned == 0) -> out
+refwh <- out$proportion
+
+ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
+  geom_area(aes(fill = race_ethn)) +
+  geom_hline(yintercept = refwh + refla) +
+  geom_hline(yintercept = refwh)
+```
+
+
+# RESULTS more concise
+
+## Sex
+
+```{r}
+table(joined$Sex, joined$negativity_any) -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+rbind(x, proportion) %>% kable()
+```
+
+
+## Ethnicity
+
+```{r}
+table(joined$Ethnic.Group, joined$negativity_any) -> x
+round((x[1,] / (x[1,] + x[2,])), 3) -> proportion
+rbind(x, proportion) %>% kable()
+```
+
+
+## Race
+
+```{r}
+table(joined$Race, joined$negativity_any) -> x
+colSums(x) -> total
+round((x[2,] / total), 3) -> proportion.black
+rbind(x, total, proportion.black) %>% kable()
+```
+
+# Skip this section (R vs E)
+
+```{r}
+table(joined$Race, joined$Ethnic.Group)
+```
+
+
+# To do
+
+-  cut out the "skip this" sections
+-  echo less code
+-  All dot/line plots on one set of axes
+-  Logistic model
+-  Dunning log-likelihood.
+-  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
+-  Limit only to those discharged from ED to home.
+-  More rigorous handling of those with multiple demographic entries.
+-  Get complete note data from IT.
+-  Consider showing which descriptor (arrange like doc:term matrix).
+-  Show length distribution of notes.
