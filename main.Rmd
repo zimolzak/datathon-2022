@@ -36,7 +36,10 @@ library(lubridate)
 library(data.table)
 library(knitr)
 library(tableone)
+library(tm)
 # library(readxl)
+
+# install.packages("SnowballC")  # Needed for stemDocument()
 
 source(file=here("functions.R"))
 ```
@@ -369,6 +372,40 @@ done_processing %>%
             ) -> summed
 ```
 
+
+
+## Text mining R package
+
+```{r text mining}
+corpus <- VCorpus(VectorSource(notes$NOTE_TEXT))  # fixme - consider SimpleCorpus?
+corpus <- tm_map(corpus, stripWhitespace)
+corpus <- tm_map(corpus, content_transformer(tolower))
+
+# lapply(corpus[2], as.character)
+# corpus <- tm_map(corpus, stemDocument)  # not convinced of fidelity
+
+dtm <- DocumentTermMatrix(corpus, list(dictionary = descrip))
+# `descrip` comes from functions.R.
+
+notes %>% select(PAT_ID, NOTE_ID, LINE) -> notes_metadata
+cbind(notes_metadata, as.matrix(dtm)) %>%
+  arrange(PAT_ID, NOTE_ID, LINE) -> lines_terms
+
+lines_terms %>%
+  group_by(PAT_ID, NOTE_ID) %>%
+  summarise_all(
+    # vars(-LINE, LINE),
+    list(~ sum(.), ~ n())
+  ) %>%
+  rename(n = LINE_n, pat_id = PAT_ID) %>%
+  select(- ends_with("_n"), -LINE_sum) %>%
+  ungroup() %>%
+  rowwise() %>%
+  mutate(negativity = sum(c_across(ends_with("_sum")))) %>%
+  ungroup() -> documents_terms
+
+```
+
 ## Distribution of neg. descriptors per patient
 
 ```{r message=FALSE, warning=FALSE}
@@ -376,6 +413,12 @@ qplot(summed$negativity) + scale_y_log10()
 ```
 
 **Figure. Negative descriptors per note.** There are 10k notes with 0 negative descriptors, 1k with 1, 100 with 3--4, etc.
+
+```{r message=FALSE, warning=FALSE}
+qplot(documents_terms$negativity) + scale_y_log10()
+```
+
+**Interesting observation.** The prior method using `count_descriptors` function appears to double the negativity relative to `tm` package.
 
 # Final analytic dataset
 
@@ -394,8 +437,28 @@ left_join(summed, demographics_tidy_rm_dups, by = c('PAT_ID' = 'pat_id')) %>%
   ) %>%
   select(-abbr) -> joined
 
+## ugly copy/paste
+
+left_join(documents_terms, demographics_tidy_rm_dups) %>%
+  mutate(
+    negativity_any = (negativity > 0),
+    race_ethn = case_when(
+      Ethnic.Group == 'Hispanic or Latino' ~ 'Latino',
+      TRUE ~ Race
+    ),
+    negativity_binned = case_when(
+      negativity < 3 ~ negativity,
+      TRUE ~ 3
+    )
+  ) -> joined_tm
+
 write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
+```
+
+```{r}
+write.csv(joined, here('analytic_dataset_tm.csv'))
+names(joined_tm)
 ```
 
 
@@ -403,6 +466,10 @@ names(joined)
 joined %>%
   head() %>%
   write.csv(here('analytic_dataset_sample.csv'))
+
+joined_tm %>%
+  head() %>%
+  write.csv(here('analytic_dataset_sample_tm.csv'))
 
 joined %>%
   select(
@@ -611,8 +678,10 @@ table(joined$Race, joined$Ethnic.Group)
 
 # To do
 
+-  All dot/line plots on one set of axes
 -  Logistic model
 -  Dunning log-likelihood.
+-  Second look at `descrip`. "pleasant" vs "unpleasant", "refuse" vs "refus".
 -  Limit only to those discharged from ED to home.
 -  More rigorous handling of those with multiple demographic entries.
 -  Get complete note data from IT.
