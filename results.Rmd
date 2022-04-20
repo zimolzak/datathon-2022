@@ -54,12 +54,16 @@ patients. Sun *et al.* used the following 15 descriptors:
 > PMID: [35044842](https://pubmed.ncbi.nlm.nih.gov/35044842/).
 
 We measured the association of race, ethnicity, and sex with these
-negative descriptor words (and word variants), in the clinical notes of 100 BCM patients who
+negative descriptor words (and word variants), in the clinical notes of 100 patients who
 had an ER visit and inpatient stay.
+
+# Methods
 
 Data cleaning, analysis, and reporting was performed using R Markdown software.
 All code (including code used to generate this report) can be found at
-https://github.com/zimolzak/datathon-2022
+https://github.com/zimolzak/datathon-2022 . There were 115 edits to the code
+from April 5 to April 20 (average 7.7 edits per day). As of April 20, the project
+comprises about 1000 lines of code (average 68 lines per day).
 
 
 

@@ -1,8 +1,25 @@
-# The association of biased language in medical text with diagnostic error
+# The association of demographic factors with negative desriptors in medical text
+
+**[Final report PDF!](https://github.com/zimolzak/datathon-2022/blob/main/results.pdf)**
+
+
+
+
+## Additional files of interest
+
+- [Data cleaning PDF](https://github.com/zimolzak/datathon-2022/blob/main/main.pdf)
+- [Additional results PDF](https://github.com/zimolzak/datathon-2022/blob/main/misc-results.pdf)
+
+- [Code for data cleaning](https://github.com/zimolzak/datathon-2022/blob/main/main.Rmd)
+- [Code for final report](https://github.com/zimolzak/datathon-2022/blob/main/results.Rmd)
+- [Code for additional results](https://github.com/zimolzak/datathon-2022/blob/main/misc-results.Rmd)
 
 **Project team:** Andrew Zimolzak MD MMSc, Traber Giardina Ph.D.
 MSW, Darius Dawson Ph.D., Terri Fletcher Ph.D., Taylor Scott, Debra
 Choi, Ph.D.
+
+
+
 
 # Background
 
@@ -25,7 +42,7 @@ the VA data warehouse and translating to other sites' Epic warehouses.
 
 # Specific Aims
 
-1.  We will select and implement one trigger using available BCM data.
+1.  We will select and implement one trigger using available data.
 
 2.  We will use a previously tested word list to measure the association
     of negative patient descriptors with marginalized group membership.
@@ -56,7 +73,7 @@ notes for themes (PMID 34259849).
 
 # Data requested (also specify study population including inclusion/exclusion criteria)
 
-The study population at BCM comprises all patients with an emergency
+The study population comprises all patients with an emergency
 department visit and ED discharge to home, followed by hospital
 admission within 30 days of the index date. If needed, we can limit to a
 specific date range or diagnoses in collaboration with IT. We request
