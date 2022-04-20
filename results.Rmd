@@ -29,13 +29,22 @@ out %>%
 
 # Introduction
 
-Recent work (PMID 35044842) used an
+Recent work used an
 expert panel to develop a list of negative patient descriptors and found
 that Black patients had disproportionately higher odds of negative
 patient descriptors appearing in the history and physical notes of their
-medical records compared with White patients.
+medical records compared with White patients. Sun *et al.* used the following 15 descriptors:
 
-We measured the association of race, ethnicity, and sex with these negative descriptors, in BCM patients with an ER visit and inpatient stay.
+> (non-)adherent, aggressive, agitated, angry, challenging, combative,
+> (non-)compliant, confront, (non-)cooperative, defensive, exaggerate,
+> hysterical, (un-)pleasant, refuse, and resist.
+
+Sun M, Oliwa T, Peek ME, Tung EL. Negative Patient Descriptors: Documenting Racial Bias In The Electronic Health Record. *Health Aff (Millwood).* 2022 Feb;41(2):203-211. PMID: 35044842.
+
+We measured the association of race, ethnicity, and sex with these negative descriptor words (and word variants), in BCM patients with an ER visit and inpatient stay.
+
+
+
 
 # Tables and figures
 
@@ -51,9 +60,12 @@ joined %>%
   summarise(grand_tot = n()) -> neg_count
 
 left_join(neg_count, race_neg_count, by="negativity_any") %>%
-  mutate(proportion = tot / grand_tot) -> stack_plot_me
+  mutate(Proportion = tot / grand_tot) -> stack_plot_me
 
-ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill = race_ethn)) -> final_plot
+ggplot(stack_plot_me, aes(x=negativity_any, y=Proportion)) +
+  geom_col(aes(fill = race_ethn)) +
+  labs(x="Negative descriptors present") +
+  scale_fill_discrete("Race/ethnicity") -> final_plot
 
 final_plot
 ```
