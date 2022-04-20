@@ -190,6 +190,10 @@ with the major groups being black, Latino, and white non-Latino,)
 there is a significant difference in the overall distribution of groups,
 between notes with vs. without a negative descriptor (*P* = `r pc`).
 
+Limitation: Negative descriptors are really only *potentially* negative descriptors.
+Sun *et al.* were able to classify usages as negative, positive, or neutral.
+We have not implemented that technique.
+
 
 
 
@@ -197,6 +201,8 @@ between notes with vs. without a negative descriptor (*P* = `r pc`).
 
 - Data retrieval and cleaning takes time!
 - Handing off a dataset is not trivial (receiving end does not know how it was made, or column meanings, and may need explanations for unexpected associations).
-- Project management: often linear not parallel, critical path, tricky to involve whole team.
+- Project management: team members often work in tandem, not in parallel.
+- Sometimes challenging to involve all team members.
 - It is possible to do things fast.
 - Record keeping is important, even when going fast.
+- With "secondary use," researchers make do with the available data. The warehouse may not have every data element needed to answer certain questions.
