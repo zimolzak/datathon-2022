@@ -1,4 +1,4 @@
-# The association of demographic factors with negative desriptors in medical text
+# The association of demographic factors with negative descriptors in medical text
 
 **[Final report PDF!](https://github.com/zimolzak/datathon-2022/blob/main/results-2022-04-20.pdf)**
 
