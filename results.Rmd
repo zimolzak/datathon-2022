@@ -19,11 +19,17 @@ joined_initial <- read.csv(
 ) 
 
 joined_initial %>%
-  rename(negativity_bool = negativity_any) %>%
+  rename(negativity_bool = negativity_any, r_e_old = race_ethn) %>%
   mutate(
     negativity_any = case_when(
       negativity_bool == TRUE ~ 'Has negative descriptors',
       negativity_bool == FALSE ~ 'No negative descriptors',
+    ),
+    race_ethn = case_when(
+      r_e_old == 'Latino' ~ 'Hispanic or Latino',
+      r_e_old == 'White or Caucasian' ~ 'White or Caucasian, non-Latino',
+      r_e_old == 'Black or African American' ~ 'Black or African American, non-Latino',
+      TRUE ~ r_e_old
     )
   ) -> joined
 ```
@@ -152,15 +158,15 @@ $P \ll 0.05$ . (Actual value *P* = `r ethn_p` .)
 ```{r table-race, echo=FALSE}
 table(joined$Race, joined$negativity_any) -> x
 colSums(x) -> Total
-round((x['Black or African American',] / Total), 3) -> Proportion.black
+round((x['Black or African American',] / Total), 3) -> Proportion.Black
 fisher.test(x)[['p.value']] -> race_alone_p
-rbind(x, Total, Proportion.black) %>% kable()
+rbind(x, Total, Proportion.Black) %>% kable()
 ```
 
 **Table 4. Distribution of race (alone), in notes with/without negative
-descriptors.** There are more black / African-American patients
+descriptors.** There are more Black / African-American patients
 represented among notes containing negative descriptors. Here, Latino
-patients can be in any grouping, although the majority are white
+patients can be in any grouping, although the majority are White
 Latino,
 $P < 0.05$ . (Actual value *P* = `r race_alone_p` .)
 
@@ -180,15 +186,15 @@ pc = signif(final_race_p, sig_figs)
 There are significantly **more Latino patients**
 (`r Proportion.Latino[2]*100` vs. `r Proportion.Latino[1]*100` percent)
 than non-Latinos represented among notes containing any negative
-descriptor (*P* = `r pe`). There are significantly **more black
-patients** (`r Proportion.black[2]*100` vs. 
-`r Proportion.black[1]*100` percent) represented among notes with any
+descriptor (*P* = `r pe`). There are significantly **more Black
+patients** (`r Proportion.Black[2]*100` vs. 
+`r Proportion.Black[1]*100` percent) represented among notes with any
 negative descriptor (*P* = `r pr`). There are significantly **fewer
 women** (`r Proportion.women[2]*100` vs. `r Proportion.women[1]*100`
 percent) represented among notes containing any negative descriptor,
 compared to notes without a negative descriptor (*P* = `r ps`).
 Considering the *combination* of race and ethnicity fields, (that is,
-with the major groups being black, Latino, and white non-Latino,)
+with the major groups being Black, Latino, and White non-Latino,)
 there is a **significant difference** in the overall distribution of groups,
 between notes with vs. without a negative descriptor (*P* = `r pc`).
 
