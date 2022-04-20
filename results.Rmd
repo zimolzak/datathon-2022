@@ -30,15 +30,6 @@ out %>%
   write.csv(here('analytic dataset v0xx 2022-04-xx.csv'))
 ```
 
-# Conclusions so far
-
-There are more women and Latino patients represented among notes containing any negative descriptor, compared to notes without a negative descriptor. There are slightly fewer black patients represented among notes with any negative descriptor.
-
-The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
-
-
-
-
 # RESULTS
 
 ## Combined race/ethnicity
@@ -115,7 +106,8 @@ fisher.test(x)[['p.value']] -> race_alone_p
 
 
 
-# CONCLUSION (narrative)
+
+# DISCUSSION
 
 There are more women (`r proportion.f[2]*100` vs. `r proportion.f[1]*100` percent) represented among notes containing any negative descriptor, compared to notes without a negative descriptor (*P* = `r sex_p`).
 
@@ -125,10 +117,18 @@ There are *slightly* more black patients (`r proportion.black[2]*100` vs. `r pro
 
 Considering the *combination* of race and ethnicity fields, (that is, with the major groups being black, Latino, and white non-Latino,) there is a significant difference in distribution of groups between notes with vs. without a negative descriptor (*P* = `r final_race_p`).
 
+The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
+
+- Data cleaning takes a while
+- Handing off a dataset is not trivial (criteria, column meanings, unexpected associations)
+- Project management, linear not parallel, critical path, involve team
+- Possible to do things fast
+- Record keeping, even when going fast
 
 
 
-# Results (too detailed)
+
+# Misc. results (too detailed)
 
 In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
@@ -384,11 +384,7 @@ ggplot(df, aes(x=y, y=x) ) + geom_col() + scale_x_log10() +
 
 
 
-# To do
-
--  Dunning log-likelihood.
-
-## Probably won't do
+# To do, or not
 
 -  Limit only to those discharged from ED to home.
 -  More rigorous handling of those with multiple demographic entries.
