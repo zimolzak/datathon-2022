@@ -63,7 +63,8 @@ Data cleaning, analysis, and reporting was performed using R Markdown software.
 All code (including code used to generate this report) can be found at
 https://github.com/zimolzak/datathon-2022 . There were 115 edits to the code
 from April 5 to April 20 (average 7.7 edits per day). As of April 20, the project
-comprises about 1000 lines of code (average 68 lines per day).
+comprises about 1000 lines of code (average 68 lines per day). All contingency
+tables were analyzed with the two-sided Fisher's exact test.
 
 
 
@@ -111,8 +112,8 @@ final_race %>% kable()
 **Table 1. Distribution of race/ethnicity, in notes with negative
 descriptors, compared to notes without negative descriptors.**
 The population with negative descriptors is significantly different from the
-population without negative descriptors (in terms of race/ethnicity distribution).
-*P* = `r final_race_p`, Fisher's exact test.
+population without negative descriptors (in terms of race/ethnicity distribution),
+$P \ll 0.05$ . (Actual value *P* = `r final_race_p`, Fisher's exact test.)
 
 
 
@@ -126,8 +127,8 @@ rbind(x, Proportion.women) %>% kable()
 
 **Table 2. Distribution of sex, in notes with/without negative
 descriptors.** There are proportionally fewer women / more men
-represented among notes containing negative descriptors.
-*P* = `r sex_p`
+represented among notes containing negative descriptors,
+$P \ll 0.05$ . (Actual value *P* = `r sex_p` .)
 
 
 
@@ -139,10 +140,10 @@ fisher.test(x)[["p.value"]] -> ethn_p
 rbind(x, Proportion.Latino) %>% kable()
 ```
 
-**Table 3. Distribution of ethnicity, in notes with/without negative
+**Table 3. Distribution of ethnicity (alone), in notes with/without negative
 descriptors.** There are proportionally more Latino patients
-represented among notes containing negative descriptors.
-*P* = `r ethn_p`
+represented among notes containing negative descriptors,
+$P \ll 0.05$ . (Actual value *P* = `r ethn_p` .)
 
 
 
@@ -156,11 +157,12 @@ fisher.test(x)[['p.value']] -> race_alone_p
 rbind(x, Total, Proportion.black) %>% kable()
 ```
 
-**Table 4. Distribution of race, in notes with/without negative
+**Table 4. Distribution of race (alone), in notes with/without negative
 descriptors.** There are more black / African-American patients
 represented among notes containing negative descriptors. Here, Latino
 patients can be in any grouping, although the majority are white
-Latino. *P* = `r race_alone_p`
+Latino,
+$P < 0.05$ . (Actual value *P* = `r race_alone_p` .)
 
 
 
@@ -187,12 +189,12 @@ percent) represented among notes containing any negative descriptor,
 compared to notes without a negative descriptor (*P* = `r ps`).
 Considering the *combination* of race and ethnicity fields, (that is,
 with the major groups being black, Latino, and white non-Latino,)
-there is a significant difference in the overall distribution of groups,
+there is a **significant difference** in the overall distribution of groups,
 between notes with vs. without a negative descriptor (*P* = `r pc`).
 
 Limitation: Negative descriptors are really only *potentially* negative descriptors.
 Sun *et al.* were able to classify usages as negative, positive, or neutral.
-We have not implemented that technique.
+We have not implemented this technique.
 
 
 
