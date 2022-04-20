@@ -1,14 +1,14 @@
 # The association of demographic factors with negative desriptors in medical text
 
-**[Final report PDF!](https://github.com/zimolzak/datathon-2022/blob/main/results.pdf)**
+**[Final report PDF!](https://github.com/zimolzak/datathon-2022/blob/main/results-2022-04-20.pdf)**
 
 
 
 
 ## Additional files of interest
 
-- [Data cleaning PDF](https://github.com/zimolzak/datathon-2022/blob/main/main.pdf)
-- [Additional results PDF](https://github.com/zimolzak/datathon-2022/blob/main/misc-results.pdf)
+- [Data cleaning PDF](https://github.com/zimolzak/datathon-2022/blob/main/main-2022-04-20.pdf)
+- [Additional results PDF](https://github.com/zimolzak/datathon-2022/blob/main/misc-results-2022-04-20.pdf)
 
 - [Code for data cleaning](https://github.com/zimolzak/datathon-2022/blob/main/main.Rmd)
 - [Code for final report](https://github.com/zimolzak/datathon-2022/blob/main/results.Rmd)
