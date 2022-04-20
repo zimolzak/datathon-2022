@@ -29,11 +29,11 @@ out %>%
 
 # Introduction
 
-Recent work used an
-expert panel to develop a list of negative patient descriptors and found
-that Black patients had disproportionately higher odds of negative
-patient descriptors appearing in the history and physical notes of their
-medical records compared with White patients. Sun *et al.* used the following 15 descriptors:
+Recent work used an expert panel to develop a list of negative patient
+descriptors and found that Black patients had disproportionately
+higher odds of negative patient descriptors appearing in the history
+and physical notes of their medical records compared with White
+patients. Sun *et al.* used the following 15 descriptors:
 
 > (non-)adherent, aggressive, agitated, angry, challenging, combative,
 > (non-)compliant, confront, (non-)cooperative, defensive, exaggerate,
@@ -44,7 +44,9 @@ medical records compared with White patients. Sun *et al.* used the following 15
 > *Health Aff (Millwood).* 2022 Feb;41(2):203-211.
 > PMID: [35044842](https://pubmed.ncbi.nlm.nih.gov/35044842/).
 
-We measured the association of race, ethnicity, and sex with these negative descriptor words (and word variants), in 100 BCM patients who had an ER visit and inpatient stay.
+We measured the association of race, ethnicity, and sex with these
+negative descriptor words (and word variants), in 100 BCM patients who
+had an ER visit and inpatient stay.
 
 Data cleaning, analysis, and reporting was performed using R Markdown software.
 All code (including code used to generate this report) can be found at
@@ -76,7 +78,13 @@ ggplot(stack_plot_me, aes(x=negativity_any, y=Proportion)) +
 
 final_plot
 ```
-**Figure. Distribution of race/ethnicity, in notes without negative descriptors, compared to notes with negative descriptors.** Latino patients are overrepresented among notes that contain one or more negative descriptor words. Here, the Latino grouping comprises *any* race, whereas the other groupings comprise *non-Latino* patients of the specified race.
+
+**Figure. Distribution of race/ethnicity, in notes without negative
+descriptors, compared to notes with negative descriptors.** Latino
+patients are overrepresented among notes that contain one or more
+negative descriptor words. Here, the Latino grouping comprises *any*
+race, whereas the other groupings comprise *non-Latino* patients of
+the specified race.
 
 
 
@@ -86,7 +94,11 @@ table(joined$race_ethn, joined$negativity_any) -> final_race
 fisher.test(final_race)[["p.value"]] -> final_race_p
 final_race %>% kable()
 ```
-**Table 1. Distribution of race/ethnicity, in notes without negative descriptors, compared to notes with negative descriptors.** The column "TRUE" means notes with one of the negative descriptors. *P* = `r final_race_p`, Fisher's exact test.
+
+**Table 1. Distribution of race/ethnicity, in notes without negative
+descriptors, compared to notes with negative descriptors.** The column
+"TRUE" means notes with one of the negative descriptors.
+*P* = `r final_race_p`, Fisher's exact test.
 
 
 
@@ -97,7 +109,11 @@ round((x[1,] / (x[1,] + x[2,])), 3) -> Proportion.women  # adhoc
 fisher.test(x)[["p.value"]] -> sex_p
 rbind(x, Proportion.women) %>% kable()
 ```
-**Table 2. Distribution of sex, in notes with/without negative descriptors.** There are proportionally fewer women / more men represented among notes containing negative descriptors. *P* = `r sex_p`
+
+**Table 2. Distribution of sex, in notes with/without negative
+descriptors.** There are proportionally fewer women / more men
+represented among notes containing negative descriptors.
+*P* = `r sex_p`
 
 
 
@@ -108,7 +124,11 @@ round((x[1,] / (x[1,] + x[2,])), 3) -> Proportion.Latino  # adhoc
 fisher.test(x)[["p.value"]] -> ethn_p
 rbind(x, Proportion.Latino) %>% kable()
 ```
-**Table 3. Distribution of ethnicity, in notes with/without negative descriptors.** There are proportionally more Latino patients represented among notes containing negative descriptors. *P* = `r ethn_p`
+
+**Table 3. Distribution of ethnicity, in notes with/without negative
+descriptors.** There are proportionally more Latino patients
+represented among notes containing negative descriptors.
+*P* = `r ethn_p`
 
 
 
@@ -121,7 +141,12 @@ round((x['Black or African American',] / Total), 3) -> Proportion.black
 fisher.test(x)[['p.value']] -> race_alone_p
 rbind(x, Total, Proportion.black) %>% kable()
 ```
-**Table 4. Distribution of race, in notes with/without negative descriptors.** There are more black / African-American patients represented among notes containing negative descriptors. Here, Latino patients can be in any grouping, although the majority are white Latino. *P* = `r race_alone_p`
+
+**Table 4. Distribution of race, in notes with/without negative
+descriptors.** There are more black / African-American patients
+represented among notes containing negative descriptors. Here, Latino
+patients can be in any grouping, although the majority are white
+Latino. *P* = `r race_alone_p`
 
 
 
@@ -136,7 +161,20 @@ pr = signif(race_alone_p, sig_figs)
 pc = signif(final_race_p, sig_figs)
 ```
 
-There are significantly **more Latino patients** (`r Proportion.Latino[2]*100` vs. `r Proportion.Latino[1]*100` percent) than non-Latinos represented among notes containing any negative descriptor (*P* = `r pe`). There are significantly **more black patients** (`r Proportion.black[2]*100` vs. `r Proportion.black[1]*100` percent) represented among notes with any negative descriptor (*P* = `r pr`). There are significantly **fewer women** (`r Proportion.women[2]*100` vs. `r Proportion.women[1]*100` percent) represented among notes containing any negative descriptor, compared to notes without a negative descriptor (*P* = `r ps`). Considering the *combination* of race and ethnicity fields, (that is, with the major groups being black, Latino, and white non-Latino,) there is a significant difference in overall distribution of groups, between notes with vs. without a negative descriptor (*P* = `r pc`).
+There are significantly **more Latino patients**
+(`r Proportion.Latino[2]*100` vs. `r Proportion.Latino[1]*100` percent)
+than non-Latinos represented among notes containing any negative
+descriptor (*P* = `r pe`). There are significantly **more black
+patients** (`r Proportion.black[2]*100` vs. 
+`r Proportion.black[1]*100` percent) represented among notes with any
+negative descriptor (*P* = `r pr`). There are significantly **fewer
+women** (`r Proportion.women[2]*100` vs. `r Proportion.women[1]*100`
+percent) represented among notes containing any negative descriptor,
+compared to notes without a negative descriptor (*P* = `r ps`).
+Considering the *combination* of race and ethnicity fields, (that is,
+with the major groups being black, Latino, and white non-Latino,)
+there is a significant difference in the overall distribution of groups,
+between notes with vs. without a negative descriptor (*P* = `r pc`).
 
 
 
@@ -148,8 +186,3 @@ There are significantly **more Latino patients** (`r Proportion.Latino[2]*100` v
 - Project management: often linear not parallel, critical path, tricky to involve whole team.
 - It is possible to do things fast.
 - Record keeping is important, even when going fast.
-
-
-
-
-
