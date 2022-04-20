@@ -11,8 +11,6 @@ library(here)
 library(knitr)
 library(dplyr)
 library(ROCR)
-
-source(file=here("functions.R"))
 ```
 
 ```{r read CSV, echo=FALSE}
