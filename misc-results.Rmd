@@ -1,0 +1,289 @@
+---
+title: "Misc results, datathon 2022"
+author: "Andrew Zimolzak"
+date: '2022-04-20'
+output: pdf_document
+---
+
+```{r libraries, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2)
+library(here)
+library(knitr)
+library(dplyr)
+library(ROCR)
+
+source(file=here("functions.R"))
+```
+
+```{r read CSV, echo=FALSE}
+joined <- read.csv(
+  here('analytic_dataset_tm.csv'), sep=",",
+  stringsAsFactors = FALSE
+) 
+```
+
+# Misc. results (too detailed)
+
+The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
+
+In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
+
+## Sex vs. negative descriptors
+
+```{r table s}
+table(joined$Sex, joined$negativity) -> x
+round((x[1,] / x[2,]), 3) -> f.m.ratio  # adhoc
+rbind(x, f.m.ratio) %>% kable()
+```
+
+```{r trend test s}
+women <- x[1,]  # adhoc
+totals <- x[1,] + x[2,]  # adhoc
+prop.trend.test(women, totals)
+```
+
+## Ethnicity vs. negative descriptors
+
+```{r table e}
+table(joined$Ethnic.Group, joined$negativity)  -> x
+round((x[1,] / x[2,]), 3) -> latino.non.ratio  # adhoc
+rbind(x, latino.non.ratio) %>% kable()
+```
+
+```{r trend test e}
+latino <- x[1,]  # adhoc
+totals <- x[1,] + x[2,]  # adhoc
+prop.trend.test(latino, totals)
+```
+
+## Race vs. negative descriptors
+
+```{r table race}
+table(joined$Race, joined$negativity)  -> x
+round((x['Black or African American',] / x['White or Caucasian',]), 2) -> b.w.ratio
+rbind(x, b.w.ratio) %>% kable()
+```
+
+```{r trend test race}
+black <- x['Black or African American',]
+totals <- colSums(x)
+prop.trend.test(black, totals)
+```
+
+## Single proportion line plot
+
+```{r plot-multi-line, echo=FALSE, message=FALSE, warning=FALSE}
+xvals = as.numeric(colnames(x))
+N = length(xvals)
+
+line_plot_me = data.frame(
+  Proportion = c(women / totals, black / totals, latino / totals),
+  Group = c(rep('Women', N), rep('Black', N), rep('Latino', N)),
+  negativity = rep(xvals, 3)
+)
+
+
+ggplot(line_plot_me, aes(x=negativity, y=Proportion, color=Group)) +
+  labs(x='Negative descriptors in note') +
+  geom_line() +
+  ylim(0,1)
+
+
+```
+
+
+
+
+# Combined race/ethnicity vs. negative descriptors
+
+## Without a "cap" on negativity
+
+```{r table combo, echo=FALSE}
+table(joined$race_ethn, joined$negativity) -> x
+
+Total <- colSums(x)
+p_asian <- round(x['Asian',] / Total, 3)
+p_black <- round(x['Black or African American',] / Total, 3)
+p_latino <- round(x['Latino',] / Total, 3)
+p_white <- round(x['White or Caucasian',] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table
+
+unified_table %>% kable()
+```
+
+```{r trend-test-re-nocap-w}
+prop.trend.test(x['White or Caucasian',], Total)
+```
+
+```{r trend-test-re-nocap-L}
+prop.trend.test(x['Latino',], Total)
+```
+
+```{r trend-test-re-nocap-b}
+prop.trend.test(x['Black or African American',], Total)
+```
+
+## With a "cap" on negativity
+
+```{r table combo binned, echo=FALSE}
+table(joined$race_ethn, joined$negativity_binned) -> x
+
+Total <- colSums(x)
+p_asian <- round(x['Asian',] / Total, 3)
+p_black <- round(x['Black or African American',] / Total, 3)
+p_latino <- round(x['Latino',] / Total, 3)
+p_white <- round(x['White or Caucasian',] / Total, 3)
+
+rbind(x, Total, p_asian, p_black, p_latino, p_white) -> unified_table_binned
+
+unified_table_binned %>% kable()
+```
+
+```{r areaplot, echo=FALSE, message=FALSE, warning=FALSE}
+joined %>%
+  select(race_ethn, negativity_binned) %>%
+  group_by(race_ethn, negativity_binned) %>%
+  summarise(tot = n()) %>%
+  arrange(negativity_binned, race_ethn) -> race_neg_count
+
+joined %>%
+  group_by(negativity_binned) %>%
+  summarise(grand_tot = n()) -> neg_count
+
+left_join(neg_count, race_neg_count, by="negativity_binned") %>%
+  mutate(proportion = tot / grand_tot) -> stack_plot_me
+
+stack_plot_me %>%
+  filter(race_ethn == 'Black or African American' & negativity_binned == 0) -> out
+refaa <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'Latino' & negativity_binned == 0) -> out
+refla <- out$proportion
+
+stack_plot_me %>%
+  filter(race_ethn == 'White or Caucasian' & negativity_binned == 0) -> out
+refwh <- out$proportion
+
+ggplot(stack_plot_me, aes(x = negativity_binned, y = proportion)) +
+  geom_area(aes(fill = race_ethn)) +
+  geom_hline(yintercept = refwh + refla) +
+  geom_hline(yintercept = refwh)
+```
+
+
+```{r trend-test-re-w}
+prop.trend.test(x['White or Caucasian',], Total)
+```
+
+```{r trend-test-re-L}
+prop.trend.test(x['Latino',], Total)
+```
+
+```{r trend-test-re-b}
+prop.trend.test(x['Black or African American',], Total)
+```
+
+
+
+
+# Logistic
+
+## Big model
+
+```{r echo=FALSE}
+joined %>%
+  select(
+    -X, -pat_id, -NOTE_ID,
+    -ends_with("_sum"), -n, -demog_entries,
+    -negativity, -negativity_binned
+  ) -> factor_me
+  
+factor_me %>%
+  summarise(
+    across(
+      c(
+        Sex, race_ethn, Employment.Status, interpreter, Language,
+        Marital.Status, mcaid, mcare, Financial.Class
+      ), factor
+    ),
+    Age = Age, negativity_any = negativity_any
+  ) -> logit_me
+```
+
+```{r logistic}
+
+my_model <- glm(negativity_any ~ ., data = logit_me, family = "binomial")
+summary(my_model)
+
+```
+
+## ROC curve
+
+```{r rocr}
+rocr_pred = prediction(my_model$fitted.values, my_model$y)
+rocr_perf <- performance(rocr_pred, measure = "tpr", x.measure = "fpr")
+auc = performance(rocr_pred, measure = "auc")
+auc@y.values
+```
+
+```{r plot-roc}
+plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
+```
+
+## Little model
+
+```{r little model}
+little_model <- glm(negativity_any ~ Sex + race_ethn + Age, data = logit_me, family = "binomial")
+summary(little_model)
+```
+
+## ROC curve
+
+```{r}
+rocr_pred = prediction(little_model$fitted.values, little_model$y)
+rocr_perf <- performance(rocr_pred, measure = "tpr", x.measure = "fpr")
+auc = performance(rocr_pred, measure = "auc")
+auc@y.values
+```
+
+```{r}
+plot(rocr_perf, col=rainbow(10), print.cutoffs.at=c(0.01, 0.1))
+```
+
+## Predicted probabilities, big vs. little
+
+```{r message=FALSE, warning=FALSE}
+qplot(my_model$fitted.values) + labs(title = 'Big model')
+```
+
+```{r message=FALSE, warning=FALSE}
+qplot(little_model$fitted.values) + labs(title = 'Little model') + xlim(0, 0.15)
+```
+
+I get the feeling it hates unbalanced classes.
+
+## Try column plot of coefficients
+
+```{r}
+df = data.frame(
+  y=my_model$coefficients,
+  x=names(my_model$coefficients)
+)
+
+ggplot(df, aes(x=y, y=x) ) + geom_col() + scale_x_log10() +
+  geom_vline(xintercept = 1)
+
+```
+
+
+
+
+# To do, or not
+
+-  Limit only to those discharged from ED to home.
+-  More rigorous handling of those with multiple demographic entries.
+-  Get complete note data from IT.
+-  Show length distribution of notes.
+
