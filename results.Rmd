@@ -1,6 +1,6 @@
 ---
-title: "BCM Datathon Team 17 Results"
-author: "Andrew Zimolzak, MD, MMSc"
+title: "The association of demographic factors with negative desriptors in medical text"
+author: "Andrew Zimolzak, Traber Giardina, Darius Dawson, Terri Fletcher, Taylor Scott, Debra Choi"
 date: 'April, 2022'
 output: pdf_document
 ---
@@ -30,11 +30,19 @@ out %>%
   write.csv(here('analytic dataset v0xx 2022-04-xx.csv'))
 ```
 
-# RESULTS
+# Introduction
 
-## Combined race/ethnicity
+Recent work (PMID 35044842) used an
+expert panel to develop a list of negative patient descriptors and found
+that Black patients had disproportionately higher odds of negative
+patient descriptors appearing in the history and physical notes of their
+medical records compared with White patients.
 
-```{r areaplot-any, echo=FALSE, message=FALSE, warning=FALSE}
+We measured the association of race, ethnicity, and sex with these negative descriptors, in BCM patients with an ER visit and inpatient stay.
+
+# Tables and figures
+
+```{r fig-area, echo=FALSE, message=FALSE, warning=FALSE}
 joined %>%
   select(race_ethn, negativity_any) %>%
   group_by(race_ethn, negativity_any) %>%
@@ -52,83 +60,83 @@ ggplot(stack_plot_me, aes(x=negativity_any, y=proportion)) + geom_col(aes(fill =
 
 final_plot
 ```
+**Figure. Distribution of race/ethnicity, in notes without negative descriptors, compared to notes with negative descriptors.** Latino patients are overrepresented among notes that contain one or more negative descriptor words. Here, the Latino grouping comprises *any* race, whereas the other groupings comprise *non-Latino* patients of the specified race.
 
-```{r, echo=FALSE}
+
+
+
+```{r table-race-ethn, echo=FALSE}
 table(joined$race_ethn, joined$negativity_any) -> final_race
+fisher.test(final_race)[["p.value"]] -> final_race_p
 final_race %>% kable()
 ```
+**Table 1. Distribution of race/ethnicity, in notes without negative descriptors, compared to notes with negative descriptors.** The column "TRUE" means notes with one of the negative descriptors. *P* = `r final_race_p`, Fisher's exact test.
 
-```{r fisher, echo=FALSE}
-fisher.test(final_race)[["p.value"]] -> final_race_p
-```
 
-*P* = `r final_race_p`
 
-## Sex
 
-```{r, echo=FALSE}
+```{r table-sex, echo=FALSE}
 table(joined$Sex, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion.f  # adhoc
+fisher.test(x)[["p.value"]] -> sex_p
 rbind(x, proportion.f) %>% kable()
 ```
+**Table 2. Distribution of sex, in notes with/without negative descriptors.** There are proportionally fewer women / more men represented among notes containing negative descriptors. *P* = `r sex_p`
 
-```{r fisher-sex, echo=FALSE}
-fisher.test(x)[["p.value"]] -> sex_p
-```
-*P* = `r sex_p`
 
-## Ethnicity
 
-```{r, echo=FALSE}
+
+```{r table-ethn, echo=FALSE}
 table(joined$Ethnic.Group, joined$negativity_any) -> x
 round((x[1,] / (x[1,] + x[2,])), 3) -> proportion.lat  # adhoc
+fisher.test(x)[["p.value"]] -> ethn_p
 rbind(x, proportion.lat) %>% kable()
 ```
+**Table 3. Distribution of ethnicity, in notes with/without negative descriptors.** There are proportionally more Latino patients represented among notes containing negative descriptors. *P* = `r ethn_p`
 
-```{r fisher-ethn, echo=FALSE}
-fisher.test(x)[["p.value"]] -> ethn_p
-```
-*P* = `r ethn_p`
 
-## Race
 
-```{r, echo=FALSE}
+
+
+```{r table-race, echo=FALSE}
 table(joined$Race, joined$negativity_any) -> x
 colSums(x) -> total
 round((x['Black or African American',] / total), 3) -> proportion.black
+fisher.test(x)[['p.value']] -> race_alone_p
 rbind(x, total, proportion.black) %>% kable()
 ```
-
-```{r fisher-race, echo=FALSE}
-fisher.test(x)[['p.value']] -> race_alone_p
-```
-*P* = `r race_alone_p`
+**Table 4. Distribution of race, in notes with/without negative descriptors.** There are more black / African-American patients represented among notes containing negative descriptors. Here, Latino patients can be in any grouping, although the majority are white Latino. *P* = `r ethn_p` *P* = `r race_alone_p`
 
 
 
 
-# DISCUSSION
+# Discussion
 
-There are more women (`r proportion.f[2]*100` vs. `r proportion.f[1]*100` percent) represented among notes containing any negative descriptor, compared to notes without a negative descriptor (*P* = `r sex_p`).
+There are fewer women (`r proportion.f[2]*100` vs. `r proportion.f[1]*100` percent) represented among notes containing any negative descriptor, compared to notes without a negative descriptor (*P* = `r sex_p`).
 
 There are more Latino patients (`r proportion.lat[2]*100` vs. `r proportion.lat[1]*100` percent) than non-Latinos represented among notes containing any negative descriptor (*P* = `r ethn_p`).
 
-There are *slightly* more black patients (`r proportion.black[2]*100` vs. `r proportion.black[1]*100` percent) represented among notes with any negative descriptor (*P* = `r race_alone_p`).
+There are more black patients (`r proportion.black[2]*100` vs. `r proportion.black[1]*100` percent) represented among notes with any negative descriptor (*P* = `r race_alone_p`).
 
 Considering the *combination* of race and ethnicity fields, (that is, with the major groups being black, Latino, and white non-Latino,) there is a significant difference in distribution of groups between notes with vs. without a negative descriptor (*P* = `r final_race_p`).
 
-The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
 
-- Data cleaning takes a while
-- Handing off a dataset is not trivial (criteria, column meanings, unexpected associations)
-- Project management, linear not parallel, critical path, involve team
-- Possible to do things fast
-- Record keeping, even when going fast
+
+
+# Data lessons learned
+
+- Data retrieval and cleaning takes time!
+- Handing off a dataset is not trivial (receiving end does not know how it was made, or column meanings, and may need explanations for unexpected associations).
+- Project management: often linear not parallel, critical path, tricky to involve whole team.
+- It is possible to do things fast.
+- Record keeping is important, even when going fast.
 
 
 
 
 # Misc. results (too detailed)
+
+The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
 
 In these tables, an upward trend in ratio means positive correlation of underprivileged group status and negative descriptors. In other words, ratios are $r = u / p$, where $u$ is the count from a group hypothesized to be underprivileged, and $p$ is the group hypothesized to be privileged.
 
