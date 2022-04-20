@@ -46,6 +46,10 @@ medical records compared with White patients. Sun *et al.* used the following 15
 
 We measured the association of race, ethnicity, and sex with these negative descriptor words (and word variants), in 100 BCM patients who had an ER visit and inpatient stay.
 
+Data cleaning, analysis, and reporting was performed using R Markdown software.
+All code (including code used to generate this report) can be found at
+https://github.com/zimolzak/datathon-2022
+
 
 
 
