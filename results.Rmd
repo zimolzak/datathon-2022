@@ -13,10 +13,19 @@ library(dplyr)
 ```
 
 ```{r read CSV, echo=FALSE}
-joined <- read.csv(
+joined_initial <- read.csv(
   here('analytic_dataset_tm.csv'), sep=",",
   stringsAsFactors = FALSE
 ) 
+
+joined_initial %>%
+  rename(negativity_bool = negativity_any) %>%
+  mutate(
+    negativity_any = case_when(
+      negativity_bool == TRUE ~ 'Has negative descriptors',
+      negativity_bool == FALSE ~ 'No negative descriptors',
+    )
+  ) -> joined
 ```
 
 ```{r write-cleaner-csv, echo=FALSE}
@@ -45,7 +54,7 @@ patients. Sun *et al.* used the following 15 descriptors:
 > PMID: [35044842](https://pubmed.ncbi.nlm.nih.gov/35044842/).
 
 We measured the association of race, ethnicity, and sex with these
-negative descriptor words (and word variants), in 100 BCM patients who
+negative descriptor words (and word variants), in the clinical notes of 100 BCM patients who
 had an ER visit and inpatient stay.
 
 Data cleaning, analysis, and reporting was performed using R Markdown software.
@@ -73,14 +82,14 @@ left_join(neg_count, race_neg_count, by="negativity_any") %>%
 
 ggplot(stack_plot_me, aes(x=negativity_any, y=Proportion)) +
   geom_col(aes(fill = race_ethn)) +
-  labs(x="Negative descriptors present") +
+  labs(x="") +
   scale_fill_discrete("Race/ethnicity") -> final_plot
 
 final_plot
 ```
 
-**Figure. Distribution of race/ethnicity, in notes without negative
-descriptors, compared to notes with negative descriptors.** Latino
+**Figure. Distribution of race/ethnicity, in notes with negative
+descriptors, compared to notes without negative descriptors.** Latino
 patients are overrepresented among notes that contain one or more
 negative descriptor words. Here, the Latino grouping comprises *any*
 race, whereas the other groupings comprise *non-Latino* patients of
@@ -95,9 +104,10 @@ fisher.test(final_race)[["p.value"]] -> final_race_p
 final_race %>% kable()
 ```
 
-**Table 1. Distribution of race/ethnicity, in notes without negative
-descriptors, compared to notes with negative descriptors.** The column
-"TRUE" means notes with one of the negative descriptors.
+**Table 1. Distribution of race/ethnicity, in notes with negative
+descriptors, compared to notes without negative descriptors.**
+The population with negative descriptors is significantly different from the
+population without negative descriptors (in terms of race/ethnicity distribution).
 *P* = `r final_race_p`, Fisher's exact test.
 
 
