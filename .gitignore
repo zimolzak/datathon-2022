@@ -10,10 +10,8 @@ onedrive/Working/Final Data/Patient*
 *.docx
 .Rapp.history
 .here
-sample.csv
 output.txt
 .Rproj.user
-sample 2.csv
 .Rhistory
 *.tex
 *.log
@@ -23,7 +21,6 @@ sample 2.csv
 Untitled*
 .ipynb_checkpoints/
 main.ipynb
-Progress Notes File.csv
 *.csv
 .RData
 
