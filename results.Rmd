@@ -10,6 +10,7 @@ library(ggplot2)
 library(here)
 library(knitr)
 library(dplyr)
+library(tidyr)
 ```
 
 ```{r read CSV, echo=FALSE}
@@ -214,3 +215,38 @@ We have not implemented this technique.
 - It is possible to do things fast.
 - Record keeping is important, even when going fast.
 - With "secondary use," researchers make do with the available data. The warehouse may not have every data element needed to answer certain questions.
+
+
+
+
+# Appendix: Most common negative descriptors
+
+```{r echo=FALSE}
+joined %>%
+  select(ends_with("_sum")) %>%
+  summarise_all(sum) %>%
+  pivot_longer(cols=ends_with("_sum"), names_to = 'descriptor_long', values_to = 'Count') %>%
+  separate(descriptor_long, sep='_', into = c('Descriptor', 'suffix')) %>%
+  select(-suffix) %>%
+  arrange(desc(Count)) -> mcnd
+
+mcnd %>% filter(Count > 0) %>% kable()
+```
+
+Limit to recently added ones only:
+
+```{r echo=FALSE}
+newest = data.frame(
+  Descriptor = c(
+    'adheres', 'complies', 'confrontational', 'exaggerates', 'refused', 'refuses', 'resists'
+  )
+)
+
+left_join(newest, mcnd, by ='Descriptor') %>%
+  arrange(desc(Count)) %>%
+  filter(Count > 0) %>%
+  kable()
+```
+
+Observation: "refused" is a very important common inflected form that I added.
+Also "refuses" is important.

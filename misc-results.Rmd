@@ -20,7 +20,10 @@ joined <- read.csv(
 ) 
 ```
 
-# Misc. results (too detailed)
+
+
+
+# Association results
 
 The analysis is pretty sensitive to the phrasing of the descriptors. Limiting to "unpleasant" results in far fewer notes than "pleasant." Also, making that change results in more negativity for: *men, non-Latinos, and black patients,* unlike the prior word list when it was just the substring "pleasant."
 
