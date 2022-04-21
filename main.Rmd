@@ -450,20 +450,13 @@ left_join(documents_terms, demographics_tidy_rm_dups) %>%
 ```
 
 ```{r eval=FALSE, include=FALSE}
-write.csv(joined, here('analytic_dataset.csv'))
+# write.csv(joined, here('analytic_dataset.csv'))
 names(joined)
 ```
 
 ```{r}
 write.csv(joined_tm, here('analytic_dataset_tm.csv'))
 names(joined_tm)
-```
-
-
-```{r samples, eval=FALSE, include=FALSE}
-joined %>%
-  head() %>%
-  write.csv(here('analytic_dataset_sample.csv'))
 ```
 
 ```{r samp2, echo=FALSE}
