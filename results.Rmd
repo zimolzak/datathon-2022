@@ -1,5 +1,5 @@
 ---
-title: "The association of demographic factors with negative desriptors in medical text"
+title: "The association of demographic factors with negative descriptors in medical text"
 author: "Andrew Zimolzak, Traber Giardina, Darius Dawson, Terri Fletcher, Taylor Scott, Debra Choi"
 date: 'April, 2022'
 output: pdf_document
