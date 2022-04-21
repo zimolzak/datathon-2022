@@ -511,4 +511,16 @@ txt_join_demog %>% filter(Race != 'Black or African American') %>% select(text) 
 
 txt_join_demog %>% filter(Ethnic.Group == 'Hispanic or Latino') %>% select(text) %>% write.csv(here('exp_latino_y.csv'))
 txt_join_demog %>% filter(Ethnic.Group != 'Hispanic or Latino') %>% select(text) %>% write.csv(here('exp_latino_n.csv'))
+
+
+txt_join_demog %>%
+  filter(Ethnic.Group == 'White or Caucasian' & Ethnic.Group != 'Hispanic or Latino') %>%
+  select(text) %>%
+  write.csv(here('exp_wnl_y.csv'))
+
+txt_join_demog %>%
+  filter(Ethnic.Group != 'White or Caucasian' | Ethnic.Group == 'Hispanic or Latino') %>%
+  select(text) %>%
+  write.csv(here('exp_wnl_n.csv'))
+
 ```
