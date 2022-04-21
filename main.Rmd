@@ -482,4 +482,33 @@ joined %>%
   slice_sample(n=6) %>%
   kable()
 ```
-**Table. Example analytic data set.** I printed the outcome variable `negativity`, but only a selection of covariates, for simplicity. There is also a binary outcome variable `negativity_any`. All covariates are retained in the output CSV files.
+
+
+
+
+
+# Export for future
+
+```{r stemmer}
+corpus_stemmed <- tm_map(corpus, stemDocument)
+```
+
+```{r many-export-txt}
+txt_vec = as.character(lapply(corpus_stemmed[], as.character))
+txt_df = data.frame(pat_id = notes$PAT_ID, text = txt_vec)
+
+left_join(txt_df, demographics_tidy_rm_dups, by='pat_id') %>%
+  select(text, Sex, Ethnic.Group, Race) -> txt_join_demog
+
+txt_join_demog %>% filter(Sex == 'Female') %>% select(text) %>% write.csv(here('exp_female_y.csv'))
+txt_join_demog %>% filter(Sex != 'Female') %>% select(text) %>% write.csv(here('exp_female_n.csv'))
+
+txt_join_demog %>% filter(Race == 'White or Caucasian') %>% select(text) %>% write.csv(here('exp_white_y.csv'))
+txt_join_demog %>% filter(Race != 'White or Caucasian') %>% select(text) %>% write.csv(here('exp_white_n.csv'))
+
+txt_join_demog %>% filter(Race == 'Black or African American') %>% select(text) %>% write.csv(here('exp_black_y.csv'))
+txt_join_demog %>% filter(Race != 'Black or African American') %>% select(text) %>% write.csv(here('exp_black_n.csv'))
+
+txt_join_demog %>% filter(Ethnic.Group == 'Hispanic or Latino') %>% select(text) %>% write.csv(here('exp_latino_y.csv'))
+txt_join_demog %>% filter(Ethnic.Group != 'Hispanic or Latino') %>% select(text) %>% write.csv(here('exp_latino_n.csv'))
+```
