@@ -26,6 +26,7 @@ library(data.table)
 library(knitr)
 library(tableone)
 library(tm)
+# library(Matrix)
 # library(readxl)
 
 # install.packages("SnowballC")  # Needed for stemDocument()
@@ -374,7 +375,6 @@ corpus <- tm_map(corpus, content_transformer(tolower))
 ```
 
 ```{r text-mine-dtm}
-
 dtm <- DocumentTermMatrix(corpus, list(dictionary = descrip))
 # `descrip` comes from functions.R.
 ```
@@ -524,3 +524,91 @@ txt_join_demog %>%
   write.csv(here('exp_wnl_n.csv'))
 
 ```
+
+```{r prep-for-dunn}
+corpus_stemmed <- tm_map(corpus_stemmed, removeWords, stopwords("english"))
+dtm_stemmed <- DocumentTermMatrix(corpus_stemmed)
+```
+
+```{r}
+is_in_group = txt_join_demog$Ethnic.Group == 'Hispanic or Latino'
+
+# fixme - make function for the following 2 steps at least
+
+term_sum_selected <- function(dtm, bool_vec) {
+  # Input a doc:term matrix. Select only certain docs.
+  # Sum up the counts, over documents.
+  # Return vector (data.frame) of counts, 1 vec element per term.
+  
+  term_count = data.frame(
+    term = dtm[["j"]][bool_vec],
+    count = dtm[["v"]][bool_vec]
+  )
+  
+  term_count %>%
+    arrange(term) %>%
+    group_by(term) %>%
+    summarise(total = sum(count)) -> term_sums
+  
+  return(term_sums)
+}
+
+term_sums_1 = term_sum_selected(dtm_stemmed, is_in_group)
+term_sums_0 = term_sum_selected(dtm_stemmed, ! is_in_group)
+
+```
+
+```{r dunn-function}
+dunning <- function(t1, t2) {
+  n1 = sum(t1$total, na.rm = TRUE)
+  n2 = sum(t2$total, na.rm = TRUE)
+  
+  inner_join(
+    t1 %>% rename(total1 = total),
+    t2 %>% rename(total2 = total),
+    by = 'term'
+  ) %>%
+    mutate(termsum = total1 + total2) %>%
+    filter(termsum >= 10) %>%
+    mutate(
+      pr1 = total1 / n1,
+      pr2 = total2 / n2,
+      pr12 = termsum / (n1 + n2),
+      d_raw = 2 * (total1 * log(pr1 / pr12) + total2 * log(pr2 / pr12)),
+      d = case_when(
+        log(pr1 / pr12) < 0 ~ -1 * d_raw,
+        TRUE ~ d_raw
+      )
+    ) -> j
+  return(j)
+  
+}
+```
+
+```{r do-dunning}
+dunning(term_sums_1, term_sums_0) %>%
+  select(term, d) %>%
+  arrange(desc(d)) -> dun_results
+
+
+tvec = dtm_stemmed[["dimnames"]][["Terms"]]
+term_decoder = data.frame(
+  term = c(1:length(tvec)),
+  term_str = tvec
+)
+
+left_join(dun_results, term_decoder, by = 'term') -> dun_results_str
+
+
+```
+
+```{r}
+
+dun_results_str %>% head(n = 20) %>% kable()
+```
+
+```{r}
+dun_results_str %>% tail(n = 20) %>% kable()
+
+```
+
