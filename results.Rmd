@@ -132,9 +132,8 @@ rbind(x, Proportion.women) %>% kable()
 ```
 
 **Table 2. Distribution of sex, in notes with/without negative
-descriptors.** There are proportionally fewer women / more men
-represented among notes containing negative descriptors,
-$P \ll 0.05$ . (Actual value *P* = `r sex_p` .)
+descriptors.** For the difference association of sex with notes containing
+negative descriptors, *P* = `r sex_p` .
 
 
 
@@ -189,10 +188,9 @@ than non-Latinos represented among notes containing any negative
 descriptor (*P* = `r pe`). There are significantly **more Black
 patients** (`r Proportion.Black[2]*100` vs. 
 `r Proportion.Black[1]*100` percent) represented among notes with any
-negative descriptor (*P* = `r pr`). There are significantly **fewer
-women** (`r Proportion.women[2]*100` vs. `r Proportion.women[1]*100`
-percent) represented among notes containing any negative descriptor,
-compared to notes without a negative descriptor (*P* = `r ps`).
+negative descriptor (*P* = `r pr`). For the proportion of women
+(`r Proportion.women[2]*100` vs. `r Proportion.women[1]*100`
+percent) among notes with a negative descriptor, vs. without, *P* = `r ps`.
 Considering the *combination* of race and ethnicity fields, (that is,
 with the major groups being Black, Latino, and White non-Latino,)
 there is a **significant difference** in the overall distribution of groups,
