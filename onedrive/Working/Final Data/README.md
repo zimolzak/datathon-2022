@@ -72,3 +72,15 @@ total 417128
 -rw-r--r--  1 ajz  staff      2978 Apr  5 10:02 README.txt
 -rw-r--r--  1 ajz  staff      2794 Apr  5 09:59 README.txt~
 ```
+
+
+# Much larger notes file
+
+`wc` followed by `ls -l` followed by `shasum` followed by `head -n 1`.
+
+```
+1449667 303485299 2203496343 Patient Progress Report 20220418.txt
+-rwxr-xr-x  1 ajz  staff  2203496343 Apr 19 16:38 Patient Progress Report 20220418.txt
+7ff14ba734f215ec85f9e7077577c7771c94d6b6  Patient Progress Report 20220418.txt
+#|PAT_ID|PAT_ENC_CSN_ID|DATE_OF_SERVIC_DTTM|IP_NOTE_TYPE_C|NOTE_CSN_ID|NOTE_ID|LINE|NOTE_TEXT
+```
